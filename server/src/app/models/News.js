@@ -9,11 +9,11 @@ const newsSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  slug: {
-    type: String,
-    slug: 'title',
-    unique: true
-  },
+  // slug: {
+  //   type: String,
+  //   slug: 'title',
+  //   unique: true
+  // },
   author: {
     type: String,
     required: true

@@ -12,6 +12,8 @@ router.get("/get_all/:id", categoryController.getAllCategory)
 router.get("/get_all_parent", categoryController.getAllParentCategory)
 
 router.get("/get_category_by_id/:id", categoryController.getCategoryById)
+router.get("/get_sub_category_by_parent/:id", categoryController.getAllSubCategoryByParent)
+
 
 router.patch("/update/:id", auth, authEmployee, categoryController.updateCategory)
 
