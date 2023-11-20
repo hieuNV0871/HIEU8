@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        require: true,
+        required: true,
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
@@ -23,9 +23,14 @@ const productSchema = new mongoose.Schema({
         ref: 'Brand',
         default: null
     },
+    collectionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Collection',
+        default: null
+    },
     price: {
         type: Number,
-        require: true,
+        required: true,
     },
     images: [
         {
@@ -44,14 +49,14 @@ const productSchema = new mongoose.Schema({
 
 
 const colorProductSchema = new mongoose.Schema({
-    colorName: {
+    name: {
         type: String,
         unique: true
     }
 }, {timestamps: true})
 
 const sizeProductSchema = new mongoose.Schema({
-    colorName: {
+    name: {
         type: String,
         unique: true
     }
@@ -78,7 +83,6 @@ const variantProductSchema = new mongoose.Schema({
         type: Number,
         require: true
     }
-    
 }, {timestamps: true})
 
 

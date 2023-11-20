@@ -5,7 +5,7 @@ const jsonStringifySafe = require('json-stringify-safe');
 const productController = {
     createProduct: async (req, res) => {
         try {
-            const {name, description, category,collection, brand, price, images} = req.body
+            const {name, description, category,collectionId, brand, price, images} = req.body
             const product = await Product.findOne({name})
             if(product) return res.status(400).json({error: "Sản phẩm đã tồn tại"})
             const newProduct = new Product({
@@ -13,7 +13,7 @@ const productController = {
                 description,
                 category,
                 brand,
-                collection,
+                collectionId,
                 price,
                 images
             })
@@ -26,7 +26,7 @@ const productController = {
 
     updateProduct: async(req, res) => {
         try {
-            const {name, description, category, brand, price, images, variants} = req.body
+            const {name, description, category, brand, price,collectionId, images, variants} = req.body
             const _id = req.params.id
             for (const variant of variants) {
                 const variantProduct = new VariantProduct({
@@ -37,12 +37,12 @@ const productController = {
                 })
                 await variantProduct.save();
             }
-            if(name||description||category||brand||price||images||variants ||collection){
-                const newProduct = await Product.findOneAndUpdate({_id}, {
-                    name, description, category, brand, collection, price, images
-                })
-                await newProduct.save();
-            }
+            // if(name||description||category||brand||price||images||variants ||collectionId){
+            //     const newProduct = await Product.findOneAndUpdate({_id}, {
+            //         name, description, category, brand, collectionId, price, images
+            //     })
+            //     await newProduct.save();
+            // }
             res.status(200).json({success: "Cập nhật sản phẩm thành công"})
         }catch (error) {
             res.status(500).json({error: error.message})
@@ -88,7 +88,7 @@ const productController = {
             const products = await Product.find({})
               .populate('category', 'name')
               .populate('brand', 'name')
-              .populate('collection', 'name')
+              .populate('collectionId', 'name')
               .skip(skip)
               .limit(limit);
         
@@ -98,7 +98,7 @@ const productController = {
               description: product.description,
               category: product.category ? product.category.name : null,
               brand: product.brand ? product.brand.name : null,
-              collection: product.collection ? product.collection.name : null,
+              collectionId: product.collectionId ? product.collectionId.name : null,
               price: product.price,
               images: product.images,
             }));
@@ -115,7 +115,7 @@ const productController = {
             const product = await Product.findById(productId)
                 .populate('category', 'name') 
                 .populate('brand', 'name')
-                .populate('collection', 'name')
+                .populate('collectionId', 'name')
 
     
             if (!product) {
