@@ -1,4 +1,4 @@
-const {Product, VariantProduct} = require('../models/Product')
+const {Product, VariantProduct, SizeProduct, ColorProduct} = require('../models/Product')
 const Category = require('../models/Category')
 
 const jsonStringifySafe = require('json-stringify-safe');
@@ -37,12 +37,12 @@ const productController = {
                 })
                 await variantProduct.save();
             }
-            // if(name||description||category||brand||price||images||variants ||collectionId){
-            //     const newProduct = await Product.findOneAndUpdate({_id}, {
-            //         name, description, category, brand, collectionId, price, images
-            //     })
-            //     await newProduct.save();
-            // }
+            if(name||description||category||brand||price||images||variants ||collectionId){
+                const newProduct = await Product.findOneAndUpdate({_id}, {
+                    name, description, category, brand, collectionId, price, images
+                })
+                await newProduct.save();
+            }
             res.status(200).json({success: "Cập nhật sản phẩm thành công"})
         }catch (error) {
             res.status(500).json({error: error.message})
@@ -133,10 +133,9 @@ const productController = {
     },
     getProductByCategory: async(req, res) => {
         try {
-            const categoryName = req.params.categoryName;
-            const category = await Category.findOne({ name: categoryName });
+            const id = req.params.id;
+            const category = await Category.findOne({ _id: id });
             const orderBy = req.params.orderBy ? req.params.orderBy : "manual";
-            console.log(category);
             let sortOptions = {};
     
             if (orderBy === 'manual') {
@@ -180,7 +179,25 @@ const productController = {
           } catch (error) {
             res.status(500).json({ error: error.message })
           }
-    }
+    },
+    getAllColor: async(req, res)=> {
+        try {
+            const colors = await ColorProduct.find();
+            res.status(200).json({success: "Lấy màu thành công", data: colors })
+          } catch (error) {
+            res.status(500).json({ error: error.message })
+          }
+    },
+    getAllSize: async(req, res)=> {
+        try {
+            const sizes = await SizeProduct.find();
+            res.status(200).json({success: "Lấy size thành công", data: sizes })
+          } catch (error) {
+            res.status(500).json({ error: error.message })
+          }
+    },
+
+   
 }
 
 module.exports = productController

@@ -1,9 +1,29 @@
 
 const Users = require("../models/User")
 const dotenv = require("dotenv")
+const bcrypt = require("bcrypt");
+const User = require("../models/User");
 dotenv.config()
 
 const userController = {
+
+  createUser: async (req, res) => {
+    try {
+      const {username, email, password} = req.body
+      if(!username || ! email || !password) return res.status(400).json({msg: "Hãy nhập tất cả các hàng"})
+      const salt = await bcrypt.genSalt(10)
+      const passwordHash = await bcrypt.hash(password, salt)
+      const newUser = new User({
+          username,
+          email,
+          password: passwordHash
+      })
+      await newUser.save()
+      res.status(200).json("test")
+  } catch (error) {
+      res.status(500).json({msg: error.message})
+  }
+  },
   getUserInfo: async (req, res) => {
     try {
       const user = await Users.findById(req.user.id).select("-password");

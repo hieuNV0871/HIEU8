@@ -11,8 +11,10 @@ router.patch("/update/:id", auth, authEmployee, productController.updateProduct)
 
 router.get("/getAllProduct", productController.getAllProduct)
 router.get("/getProductById/:id",  productController.getProductByID)
-router.get("/getProductByCategory/:categoryName", productController.getProductByCategory)
+router.get("/getProductByCategory/:id", productController.getProductByCategory)
 router.get("/search", productController.searchProduct)
+router.get("/getAllSize", productController.getAllSize)
+router.get("/getAllColor", productController.getAllColor)
 
 router.delete("/delete/:id",auth, authEmployee, productController.deleteOneProduct)
 router.delete("/delete_selected/",auth, authEmployee, productController.deleteSelectedProduct)

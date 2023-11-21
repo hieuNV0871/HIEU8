@@ -1,11 +1,21 @@
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
+const {ColorProduct, SizeProduct} = require('../../app/models/Product')
 dotenv.config()
 mongoose.set("strictQuery", false)
 
 async function connect() {
     try {
         await mongoose.connect(process.env.MONGOOSE_URL)
+        // await ColorProduct.create({ name: 'xanh' });
+        // await ColorProduct.create({ name: 'do' });
+        // await ColorProduct.create({ name: 'tim' });
+        // await ColorProduct.create({ name: 'vang' });
+        // await SizeProduct.create({ name: '29' });
+        // await SizeProduct.create({ name: '30' });
+        // await SizeProduct.create({ name: 'M' });
+        // await SizeProduct.create({ name: 'XL' });
+
         console.log("database connected")
     } catch (error) {
         console.log("connect fail");
