@@ -11,10 +11,19 @@ const ordersSchema = new mongoose.Schema({
         ref: 'User',
         default: null
     },
-    orders: {
-        type: Array,
-        require: true
-    },
+    ordersItems: [
+        {
+            product: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+            },
+            variant: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "VariantProduct"
+            },
+            quantity: { type: Number, default: 1 }
+        }
+    ],
     address: {
         type: String,
         require: true

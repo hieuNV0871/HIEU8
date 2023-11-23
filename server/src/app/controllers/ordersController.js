@@ -1,192 +1,77 @@
 const Orders = require("../models/Orders");
-const Product = require("../models/Product");
+const Cart = require("../models/Cart");
 
+const {VariantProduct} = require('../models/Product')
 const ordersController = {
 
 
   createOrders: async (req, res) => {
     try {
-      const { order, name, userId, address, phone, paymentMethod, totalPrice } =
-        req.body;
-      if (order.length < 1)
+      const { ordersItems, name, user, address, phone, paymentMethod, totalPrice } = req.body;
+  
+      if (ordersItems.length < 1)
         return res.status(400).json({ error: "Giỏ hàng của bạn đang trống" });
+  
       if (!address)
-        return res
-          .status(400)
-          .json({ error: "Vui lòng cập nhật địa chỉ giao hàng" });
+        return res.status(400).json({ error: "Vui lòng cập nhật địa chỉ giao hàng" });
+
       const newOrders = new Orders({
-        userId,
+        user,
         name,
-        order,
+        ordersItems,
         address,
         phone,
         paymentMethod,
         totalPrice,
       });
-      const user = await User.findById(userId)
+  
 
-      for (let i = 0; i < user.cart.length; i++) {
-        for (let j = 0; j < order.length; j++) {
-          if (user.cart[i].productId === order[j].productId) {
-            user.cart[i].quantity = user.cart[i].quantity - order[j].quantity;
-          }
+      const cartPrice = await Cart.findOne({ user }).populate('cartItems.product', 'price');
+    const cartTotalPrice = cartPrice.cartItems.reduce((total, item) => total + item.product.price * item.quantity, 0);
+
+    if (totalPrice !== cartTotalPrice) {
+      return res.status(400).json({ error: "Tổng giá trị đơn hàng không khớp với giỏ hàng" });
+    }
+
+    await Cart.findOneAndUpdate({ user }, { $pull: { cartItems: { product: { $in: ordersItems.map(item => item.product) } } } });
+
+      for (const item of ordersItems) {
+        
+        const variant = await VariantProduct.findById(item.variant);
+        if (variant) {
+          variant.quantity -= item.quantity;
+          await variant.save();
         }
       }
-      let cartTmp = [];
-      for (let index = 0; index < user.cart.length; index++) {
-        if (user.cart[index].quantity > 0) {
-          cartTmp.push(user.cart[index]);
-        }
-      }
-      const Orders = await newOrders.save();
+      await newOrders.save();
 
-      if (Orders) {
-        order.map((item) => {
-          sold(item.productId, item.color, item.size, item.quantity);
-
-        });
-        await User.findByIdAndUpdate({ _id: user._id }, { cart: cartTmp });
-      } else {
-        return res.status(400).json({ error: "co loi xay ra" });
-      }
-      res
-        .status(200)
-        .json({ success: "Tạo đơn hàng thành công", data: newOrders });
+      res.status(200).json({ success: "Tạo đơn hàng thành công", data: newOrders });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
 
-  //for payment middleware check
-  updateStatusOrders: async (req, res) => {
+
+  updateOrdersStatus: async (req, res) => {
     try {
-      const { status } = req.body;
-      const _id = req.params.id;
-      let updateOrders
-      if (false) {
-         updateOrders = await Orders.findByIdAndUpdate({ _id }, { status: 1 });
+      const { orderId, status } = req.body;
+      const existingOrder = await Orders.findById(orderId);
+      if (!existingOrder) {
+        return res.status(404).json({ error: "Đơn hàng không tồn tại" });
       }
-      res
-        .status(200)
-        .json({ success: "Cập nhật đơn hàng thành công", data: updateOrders });
+      existingOrder.status = status;
+      await existingOrder.save();
+      res.status(200).json({ success: "Cập nhật trạng thái đơn hàng thành công", data: existingOrder });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   },
 
   // admin
-  updateOrders: async (req, res) => {
-    try {
-      const {
-        order,
-        name,
-        status,
-        user,
-        address,
-        phone,
-        paymentMethods,
-        totalPrice,
-      } = req.body;
-      if (order.length < 1)
-        return res.status(400).json({ error: "Giỏ hàng của bạn đang trống" });
-      if (!address)
-        return res
-          .status(400)
-          .json({ error: "Vui lòng cập nhật địa chỉ giao hàng" });
-
-      for (let i = 0; i < user.cart.length; i++) {
-        for (let j = 0; j < order.length; j++) {
-          if (user.cart[i]._id === order[j]._id) {
-            user.cart[i].quantity = user.cart[i].quantity - order[j].quantity;
-          }
-        }
-      }
-      let cartTmp = [];
-      for (let index = 0; index < user.cart.length; index++) {
-        if (user.cart[index].quantity > 0) {
-          cartTmp.push(user.cart[index]);
-        }
-      }
-      const _id = req.params.id;
-      const Orders = await Orders.findByIdAndUpdate(
-        { _id },
-        {
-          order,
-          name,
-          user,
-          status,
-          address,
-          phone,
-          paymentMethods,
-          totalPrice,
-        }
-      );
-
-      if (Orders) {
-        order.map((item) => {
-          sold(item._id, item.color, item.size, item.quantity);
-        });
-        await User.findByIdAndUpdate({ _id: user._id }, { cart: cartTmp });
-      } else {
-        return res.status(400).json({ error: "co loi xay ra" });
-      }
-      res
-        .status(200)
-        .json({ success: "Cập nhật đơn hàng thành công", data: newOrders });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
   //    de day mai lam tiep ^^
   updatePersonalOrders: async (req, res) => {
     try {
-      const { order, name, user, address, phone, paymentMethods, totalPrice } =
-        req.body;
-      if (order.length < 1)
-        return res.status(400).json({ error: "Giỏ hàng của bạn đang trống" });
-      if (!address)
-        return res
-          .status(400)
-          .json({ error: "Vui lòng cập nhật địa chỉ giao hàng" });
 
-      for (let i = 0; i < user.cart.length; i++) {
-        for (let j = 0; j < order.length; j++) {
-          if (user.cart[i]._id === order[j]._id) {
-            user.cart[i].quantity = user.cart[i].quantity - order[j].quantity;
-          }
-        }
-      }
-      let cartTmp = [];
-      for (let index = 0; index < user.cart.length; index++) {
-        if (user.cart[index].quantity > 0) {
-          cartTmp.push(user.cart[index]);
-        }
-      }
-      const _id = req.params.id;
-      const Orders = await Orders.findByIdAndUpdate(
-        { _id },
-        {
-          order,
-          name,
-          user,
-          address,
-          phone,
-          paymentMethods,
-          totalPrice,
-        }
-      );
-
-      if (Orders) {
-        order.map((item) => {
-          sold(item._id, item.quantity);
-        });
-        await User.findByIdAndUpdate({ _id: user._id }, { cart: cartTmp });
-      } else {
-        return res.status(400).json({ error: "co loi xay ra" });
-      }
-      res
-        .status(200)
-        .json({ success: "Cập nhật đơn hàng thành công", data: newOrders });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -194,14 +79,7 @@ const ordersController = {
 
   deleteOneOrders: async (req, res) => {
     try {
-      const id = req.params.id;
-      const Orders = await Orders.findById(id);
-      if (!Orders)
-        return res
-          .status(404)
-          .json({ error: "Không tìm thấy hóa đơn của bạn" });
-      await Orders.deleteById(id);
-      res.status(200).json({ success: "Xoá đơn hàng thành công" });
+      
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -209,8 +87,28 @@ const ordersController = {
 
   getPersonalOrders: async (req, res) => {
     try {
-      const userId = req.user.id;
-      const Orderss = await Orders.find({ userId });
+      const user = req.user.id;
+      const Orderss = await Orders.find({ user })
+      .populate({
+        path: "ordersItems.product",
+        model: "Product",
+      })
+      .populate({
+        path: "ordersItems.variant",
+        model: "VariantProduct",
+        populate: {
+          path: "colorId",
+          model: "ColorProduct",
+        },
+      })
+      .populate({
+        path: "ordersItems.variant",
+        model: "VariantProduct",
+        populate: {
+          path: "sizeId",
+          model: "SizeProduct",
+        },
+      });
       res
         .status(200)
         .json({ success: "Lấy toàn bộ đơn hàng thành công", data: Orderss });
@@ -220,7 +118,27 @@ const ordersController = {
   },
   getAllOrders: async (req, res) => {
     try {
-      const Orderss = await Orders.find();
+      const Orderss = await Orders.find()
+      .populate({
+        path: "ordersItems.product",
+        model: "Product",
+      })
+      .populate({
+        path: "ordersItems.variant",
+        model: "VariantProduct",
+        populate: {
+          path: "colorId",
+          model: "ColorProduct",
+        },
+      })
+      .populate({
+        path: "ordersItems.variant",
+        model: "VariantProduct",
+        populate: {
+          path: "sizeId",
+          model: "SizeProduct",
+        },
+      });
       res
         .status(200)
         .json({ success: "Lấy toàn bộ hoa don thành công", data: Orderss });
