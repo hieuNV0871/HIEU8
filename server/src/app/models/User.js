@@ -34,13 +34,6 @@ const userSchema = new mongoose.Schema({
         id: {
             type: String
         }
-    },
-    
-    cart: {
-        type: Array,
-        default: [
-            
-        ]
     }
 
 }, {timestamps: true})

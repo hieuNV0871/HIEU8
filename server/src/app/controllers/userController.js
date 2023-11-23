@@ -84,27 +84,6 @@ const userController = {
     }
   },
 
-  addToCart: async (req, res) => {
-    try {
-      
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-  updateCartItem: async (req, res) => {
-    try {
-      
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-   deleteCartItem: async (req, res) => {
-    try {
-      
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
-  }
 };
 
 module.exports = userController

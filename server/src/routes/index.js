@@ -9,7 +9,7 @@ const productRouter = require('./product')
 const newsRouter = require('./news')
 const userRouter = require('./user')
 const ordersRouter = require('./orders')
-
+const cartRouter = require('./cart')
 function route(app) {
     app.use('/v1/auth', authRouter)
     app.use('/v1/upload', uploadRouter)
@@ -20,6 +20,8 @@ function route(app) {
     app.use('/v1/orders', ordersRouter)
     app.use('/v1/news', newsRouter)
     app.use('/v1/user', userRouter)
+    app.use('/v1/cart', cartRouter)
+
 
     app.use((req, res, next) => {
         res.status(404).json({error: 'Not found!'})

@@ -60,16 +60,7 @@ const categoryController = {
             
         }
     },
-    getAllCategory: async(req, res)=> {
-        try {
-            const parentCategoryId = req.params.id
-            const categories = await Category.find({ parentCategory: parentCategoryId }).populate('parentCategory', 'name');
-            res.status(200).json({success: "Lấy danh mục con thành công", data: categories})
-        } catch (error) {
-            res.status(500).json({error: error.message})
-            
-        }
-    },
+   
     getAllParentCategory: async (req, res) => {
         try {
            const categories = await Category.find({ parentCategory: null })
@@ -81,9 +72,8 @@ const categoryController = {
 
     getAllSubCategoryByParent: async(req, res) => {
         try {
-            const { parentId } = req.params;   
+            const parentId  = req.params.id;  
             const subcategories = await Category.find({ parentCategory: parentId });
-    
             res.status(200).json({ success: "Lấy tất cả danh mục con theo cha thành công", data: subcategories });
         } catch (error) {
             res.status(500).json({ error: error.message });

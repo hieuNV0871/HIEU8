@@ -11,6 +11,7 @@ router.patch("/update/:id", auth, authEmployee, productController.updateProduct)
 
 router.get("/getAllProduct", productController.getAllProduct)
 router.get("/getProductById/:id",  productController.getProductByID)
+router.get("/getProductByVariant/:id", productController.getProductByVariant)
 router.get("/getProductByCategory/:id", productController.getProductByCategory)
 router.get("/search", productController.searchProduct)
 router.get("/getAllSize", productController.getAllSize)

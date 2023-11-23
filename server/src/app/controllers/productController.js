@@ -196,6 +196,18 @@ const productController = {
             res.status(500).json({ error: error.message })
           }
     },
+    getProductByVariant: async(req, res)=> {
+        try {
+            const _id = req.params.id
+            const variant = await VariantProduct.findById(_id)
+            .populate('sizeId')
+            .populate('colorId')
+            res.status(200).json({success: "Lấy sản phẩm thành công", data: variant })
+          } catch (error) {
+            res.status(500).json({ error: error.message })
+          }
+    },
+    
 
    
 }

@@ -6,12 +6,9 @@ const CollectionController = {
     createCollection: async (req, res) => {
         try {
             const {name, position} = req.body
-            const Collection = await Collection.findOne({
-                $or: [{ name }, { position}]
-              });
-              if (Collection) {
-                
-                    if (Collection.name === name) {
+            const collection = await Collection.findOne({name});
+              if (collection) {
+                    if (collection.name === name) {
                       return res.status(400).json({ error: "Bộ sưu tập đã tồn tại" });
                     } else{
                       return res.status(400).json({ error: "Thứ tự đã tồn tại" });

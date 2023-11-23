@@ -18,8 +18,8 @@ const collectionSchema = new mongoose.Schema({
 
     position: {
         type: Number,
-        require: true,
-        unique: true
+        unique: true,
+        default: 0
     }
 
 }, {timestamps: true})
