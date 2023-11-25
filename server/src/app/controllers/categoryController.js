@@ -63,10 +63,18 @@ const categoryController = {
    
     getAllParentCategory: async (req, res) => {
         try {
-           const categories = await Category.find({ parentCategory: null })
-            res.status(200).json({success: "Lấy tất cả danh mục cha thành công", data: categories})
+            const categories = await Category.find({ parentCategory: null }).lean();
+        
+            for (const parentCategory of categories) {
+                const subcategories = await Category.find({ parentCategory: parentCategory._id }).lean();
+                parentCategory.children = subcategories;
+            }
+        
+            console.log(categories);
+        
+            res.status(200).json({ success: "Lấy tất cả danh mục cha thành công", data: categories });
         } catch (error) {
-            res.status(500).json({error: error.message})
+            res.status(500).json({ error: error.message });
         }
     },
 
