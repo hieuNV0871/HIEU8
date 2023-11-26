@@ -131,24 +131,10 @@ const productController = {
             res.status(500).json({ error: error.message });
         }
     },
-    getProductByCategory: async(req, res) => {
+    getProductBySubCategory: async(req, res) => {
         try {
             const id = req.params.id;
             const category = await Category.findOne({ _id: id });
-            const orderBy = req.params.orderBy ? req.params.orderBy : "manual";
-            let sortOptions = {};
-    
-            if (orderBy === 'manual') {
-                sortOptions = { _id: -1 };
-            } else if (orderBy === 'price-ascending') {
-                sortOptions = { price: 1 };
-            } else if (orderBy === 'price-descending') {
-                sortOptions = { price: -1 };
-            } else if (orderBy === 'title-ascending') {
-                sortOptions = { name: 1 };
-            } else if (orderBy === 'title-descending') {
-                sortOptions = { name: -1 };
-            }
             if (!category) {
                 return res.status(404).json({ message: 'Danh mục không tồn tại' });
             }
@@ -157,20 +143,37 @@ const productController = {
             }
             const products = await Product.find({
                 category: category._id
-            }).sort(sortOptions);
+            })
             res.status(200).json({success: "Lấy sản phẩm thành công", data: products})
         } catch (error) {
             res.status(500).json({ error: error.message })
+        }
+    },
+    getProductByParentCategory: async(req, res)=>{
+        try {
+            const parentCategoryId = req.params.id;
+            const parentCategory = await Category.findOne({ _id: parentCategoryId });
+            if (!parentCategory) {
+                return res.status(404).json({ message: 'Danh mục cha không tồn tại' });
+            }
+            const subCategories = await Category.find({ parentCategory: parentCategory._id });
+            const products = await Product.find({
+                category: { $in: [parentCategoryId, ...subCategories.map(sub => sub._id)] }
+            });
+    
+            res.status(200).json({ success: "Lấy sản phẩm thành công", data: products });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
     },
 
     searchProduct: async(req, res)=> {
         try {
             const keyword = req.query.keyword;
-    
+            const limit = req.query.limit || 5;
             const results = await Product.find({
                 name: { $regex: new RegExp(keyword, 'i') }
-            });
+            }).limit(limit);
             // const variant = VariantProduct.find({
             //     colorId: { $regex: new RegExp(keyword, 'i') }
             // }).populate('colorId', 'name');
