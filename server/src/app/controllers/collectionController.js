@@ -63,29 +63,34 @@ const CollectionController = {
 
     getAllCollection: async (req, res) => {
         try {
-            const limit = req.query.limit || null; 
-            const page = req.query.page || 1; 
-            const skip = (page - 1) * limit; 
-            const search = req.query.search || null
-            let collections
-            if(search){
-                collections = await Collection.find({
-                   $expr: {
-                     $regexMatch: {
-                       input: { $getField: 'name' },
-                       regex: new RegExp(search, 'i')
-                     }
-                   }
-                 }).limit(limit); }
-                else{
-                    collections = await Collection.find().skip(skip).limit(limit);
-
-                }
-            res.status(200).json({success: "Lấy tất cả bộ sưu tập thành công", data: collections})
+          const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
+          const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+          const skip = (page - 1) * limit;
+      
+          const search = req.query.search || null;
+      
+          let collections;
+      
+          if (search) {
+            collections = await Collection.find({
+              $expr: {
+                $regexMatch: {
+                  input: { $getField: 'name' },
+                  regex: new RegExp(search, 'i'),
+                },
+              },
+            })
+              .skip(skip)
+              .limit(limit);
+          } else {
+            collections = await Collection.find().skip(skip).limit(limit);
+          }
+      
+          res.status(200).json({ success: "Lấy tất cả bộ sưu tập thành công", data: collections });
         } catch (error) {
-            res.status(500).json({error: error.message})
+          res.status(500).json({ error: error.message });
         }
-    }
+      }
 }
 
 
