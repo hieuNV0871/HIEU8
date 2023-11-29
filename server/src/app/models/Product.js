@@ -82,6 +82,9 @@ const variantProductSchema = new mongoose.Schema({
     quantity: {
         type: Number,
         require: true
+    },
+    sku: {
+        type: String
     }
 }, {timestamps: true})
 

@@ -13,6 +13,12 @@ const authController = {
     signup: async (req, res)=>{
         try {
             const {username, email, password} = req.body
+            const existingUser = await Users.findOne({ $or: [{ username }, { email }] });
+
+                if (existingUser) {
+                // If the user or email already exists, return an error
+                return res.status(400).json({ msg: "Tài khoản hoặc email đã được sử dụng" });
+                }
             if(!username || ! email || !password) return res.status(400).json({msg: "Hãy nhập tất cả các hàng"})
             if(!validateEmail(email)) return res.status(400).json({msg: "Sai định dạng email"})
             
@@ -25,7 +31,7 @@ const authController = {
                 password: passwordHash
             }
             const activation_token = createActiveToken(newUser)
-            const url = `${CLIENT_URL}/auth/activate/v1/${activation_token}`
+            const url = `${CLIENT_URL}/auth/activeEmail/${activation_token}`
             const btnTitle = "click here to active"
             sendMail(email, url, btnTitle)
             res.status(200).json("test")
@@ -39,25 +45,25 @@ const authController = {
           const { oldPassword, password, cfPassword } = req.body;
       
           if (!oldPassword || !password || !cfPassword) {
-            return res.status(400).json({ error: "Hãy nhập tất cả các hàng" });
+            return res.status(400).json({ msg: "Hãy nhập tất cả các hàng" });
           }
       
           if (password !== cfPassword) {
             return res
               .status(400)
-              .json({ error: "Mật khẩu xác nhận không chính xác" });
+              .json({ msg: "Mật khẩu xác nhận không chính xác" });
           }
       
           const user = await Users.findById(id);
       
           if (!user) {
-            return res.status(404).json({ error: "Người dùng không tồn tại" });
+            return res.status(404).json({ msg: "Người dùng không tồn tại" });
           }
       
           const isMatch = await bcrypt.compare(oldPassword, user.password);
       
           if (!isMatch) {
-            return res.status(401).json({ error: "Mật khẩu hiện tại không chính xác" });
+            return res.status(401).json({ msg: "Mật khẩu hiện tại không chính xác" });
           }
       
           const salt = await bcrypt.genSalt(10);
@@ -67,7 +73,7 @@ const authController = {
       
           res.status(200).json({ success: "Thay đổi mật khẩu thành công" });
         } catch (error) {
-          res.status(500).json({ error: error.message });
+          res.status(500).json({ msg: error.message });
         }
       },
     activeEmail: async (req, res) => {
@@ -141,8 +147,8 @@ const authController = {
             const {email} = req.body
             const user = await Users.findOne({email})
             if(!user) return res.status(400).json({msg: "Tài khoản email chưa tạo"})
-            const accessToken = createAccessToken({id: user._id})
-            const url = `${CLIENT_URL}/auth/reset_password/v1/${accessToken}`
+            const reset_token = createAccessToken({id: user._id})
+            const url = `${CLIENT_URL}/auth/reset_password/${reset_token}`
             sendMail(email, url, "Đặt lại mật khẩu")
             res.json({msg: "Đã gửi liên kết để đặt lại mật khẩu, hãy kiểm tra email của bạn"})
         } catch (error) {

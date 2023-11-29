@@ -28,15 +28,21 @@ const productController = {
         try {
             const {name, description, category, brand, price,collectionId, images, variants} = req.body
             const _id = req.params.id
+            const variantProducts = [];
             for (const variant of variants) {
+                const size = await SizeProduct.findById(variant.sizeId);
+                const color = await ColorProduct.findById(variant.colorId);
+                const sku = `NVH${size.name}${color.name}`;
                 const variantProduct = new VariantProduct({
                     productId: _id,
                     sizeId: variant.sizeId,
                     colorId: variant.colorId,
                     quantity: variant.quantity,
+                    sku: sku
                 })
-                await variantProduct.save();
+                variantProducts.push(variantProduct);
             }
+            await VariantProduct.insertMany(variantProducts);
             if(name||description||category||brand||price||images||variants ||collectionId){
                 const newProduct = await Product.findOneAndUpdate({_id}, {
                     name, description, category, brand, collectionId, price, images
@@ -81,7 +87,7 @@ const productController = {
     // get
     getAllProduct: async(req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
+            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
         
@@ -133,6 +139,9 @@ const productController = {
     },
     getProductBySubCategory: async(req, res) => {
         try {
+            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+            const skip = (page - 1) * limit;
             const id = req.params.id;
             const category = await Category.findOne({ _id: id });
             if (!category) {
@@ -143,7 +152,8 @@ const productController = {
             }
             const products = await Product.find({
                 category: category._id
-            })
+            }).skip(skip).limit(limit);
+            
             res.status(200).json({success: "Lấy sản phẩm thành công", data: products})
         } catch (error) {
             res.status(500).json({ error: error.message })
@@ -170,7 +180,7 @@ const productController = {
     searchProduct: async(req, res)=> {
         try {
             const keyword = req.query.keyword;
-            const limit = req.query.limit || 5;
+            const limit = req.query.limit || null;
             const results = await Product.find({
                 name: { $regex: new RegExp(keyword, 'i') }
             }).limit(limit);

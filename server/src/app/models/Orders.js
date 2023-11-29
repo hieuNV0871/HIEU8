@@ -41,7 +41,7 @@ const ordersSchema = new mongoose.Schema({
     },
     status: {
         type: Number,
-        default: 0 // o la chua thanh toán, 1 la ok
+        default: 0 // o la đang chờ, 1 la ....
     },
 
     totalPrice: {

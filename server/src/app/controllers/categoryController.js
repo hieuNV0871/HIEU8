@@ -63,14 +63,13 @@ const categoryController = {
    
     getAllParentCategory: async (req, res) => {
         try {
-            const categories = await Category.find({ parentCategory: null }).lean();
+            const limit = parseInt(req.query.limit) || 100; // Default limit to 10 if not provided
+            const categories = await Category.find({ parentCategory: null }).lean().limit(limit);
         
             for (const parentCategory of categories) {
                 const subcategories = await Category.find({ parentCategory: parentCategory._id }).lean();
                 parentCategory.children = subcategories;
             }
-        
-            console.log(categories);
         
             res.status(200).json({ success: "Lấy tất cả danh mục cha thành công", data: categories });
         } catch (error) {

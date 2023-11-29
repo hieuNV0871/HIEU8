@@ -10,7 +10,7 @@ const app = express()
 
 db.connect()
 
-const whitelist = ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5173', 'http://localhost:5174']
+const whitelist = ['http://localhost:3000', 'http://localhost:2000', 'http://localhost:5173', 'http://localhost:5174']
 const corsOptions = {
   credentials: true,
   origin: (origin, callback) => {

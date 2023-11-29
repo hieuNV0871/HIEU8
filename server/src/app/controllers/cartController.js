@@ -164,6 +164,14 @@ const cartController = {
           path: "cartItems.variant",
           model: "VariantProduct",
           populate: {
+            path: "productId",
+            model: "Product"
+          }
+        })
+        .populate({
+          path: "cartItems.variant",
+          model: "VariantProduct",
+          populate: {
             path: "colorId",
             model: "ColorProduct",
           },
