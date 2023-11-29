@@ -161,6 +161,9 @@ const productController = {
     },
     getProductByParentCategory: async(req, res)=>{
         try {
+            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+            const skip = (page - 1) * limit;
             const parentCategoryId = req.params.id;
             const parentCategory = await Category.findOne({ _id: parentCategoryId });
             if (!parentCategory) {
@@ -169,7 +172,7 @@ const productController = {
             const subCategories = await Category.find({ parentCategory: parentCategory._id });
             const products = await Product.find({
                 category: { $in: [parentCategoryId, ...subCategories.map(sub => sub._id)] }
-            });
+            }).skip(skip).limit(limit);
     
             res.status(200).json({ success: "Lấy sản phẩm thành công", data: products });
         } catch (error) {

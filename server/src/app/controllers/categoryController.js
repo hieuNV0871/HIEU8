@@ -63,8 +63,10 @@ const categoryController = {
    
     getAllParentCategory: async (req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || 100; // Default limit to 10 if not provided
-            const categories = await Category.find({ parentCategory: null }).lean().limit(limit);
+            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+            const skip = (page - 1) * limit;
+            const categories = await Category.find({ parentCategory: null }).lean().skip(skip).limit(limit);
         
             for (const parentCategory of categories) {
                 const subcategories = await Category.find({ parentCategory: parentCategory._id }).lean();
@@ -79,8 +81,12 @@ const categoryController = {
 
     getAllSubCategoryByParent: async(req, res) => {
         try {
+            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+            const skip = (page - 1) * limit;
+
             const parentId  = req.params.id;  
-            const subcategories = await Category.find({ parentCategory: parentId });
+            const subcategories = await Category.find({ parentCategory: parentId }).skip(skip).limit(limit);
             res.status(200).json({ success: "Lấy tất cả danh mục con theo cha thành công", data: subcategories });
         } catch (error) {
             res.status(500).json({ error: error.message });

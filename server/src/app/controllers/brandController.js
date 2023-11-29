@@ -37,7 +37,10 @@ const brandController = {
     },
     getAllBrand: async(req, res)=> {
         try {
-            const brands = await brand.find();
+            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+            const skip = (page - 1) * limit;
+            const brands = await brand.find().skip(skip).limit();
             res.status(200).json({success: "Lấy thương hiệu con thành công", data: brands})
         } catch (error) {
             res.status(500).json({error: error.message})

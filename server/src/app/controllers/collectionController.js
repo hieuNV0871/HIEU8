@@ -51,6 +51,7 @@ const CollectionController = {
     },
     getCollectionById: async(req, res)=> {
         try {
+            
             const id = req.params.id
             const Collection = await Collection.findById(id)
             res.status(200).json({success: "Lấy sản phẩm thành công", data: Collection})

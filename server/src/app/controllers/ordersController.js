@@ -145,6 +145,9 @@ const ordersController = {
   },
   getAllOrders: async (req, res) => {
     try {
+      const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+      const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+      const skip = (page - 1) * limit;
       const Orderss = await Orders.find()
         .populate({
           path: "ordersItems.product",
@@ -165,7 +168,7 @@ const ordersController = {
             path: "sizeId",
             model: "SizeProduct",
           },
-        });
+        }).skip(skip).limit(limit);
       res
         .status(200)
         .json({ success: "Lấy toàn bộ hoa don thành công", data: Orderss });
