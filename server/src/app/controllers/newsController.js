@@ -39,19 +39,35 @@ const newsController = {
             const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
+            const totalNews = await News.countDocuments();
+            const total = Math.ceil(totalNews / limit);
             const news = await News.find().skip(skip).limit(limit)
-            res.status(200).json({success: "Lấy tất cả bài viết thành công", data: news})
+            res.status(200).json({success: "Lấy tất cả bài viết thành công", data: news, total})
         } catch (error) {
             res.status(500).json({error: error.message})
         }
     },
     getAllNewsPublished: async (req, res) => {
         try {
+            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
+            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
+            const skip = (page - 1) * limit;
+        
             const currentTime = new Date();
-            const news = await News.find({ publishedAt: { $lte: currentTime } });
-            res.status(200).json({success: "Lấy tất cả bài biết đã xuất bản thành công", data: news})
+            const news = await News.find({ publishedAt: { $lte: currentTime } })
+                .skip(skip)
+                .limit(limit);
+            
+            const totalPublishedNews = await News.countDocuments({ publishedAt: { $lte: currentTime } });
+            const totalPages = Math.ceil(totalPublishedNews / limit);
+        
+            res.status(200).json({
+                success: "Lấy tất cả bài biết đã xuất bản thành công",
+                data: news,
+                total: totalPages,
+            });
         } catch (error) {
-            res.status(500).json({error: error.message})
+            res.status(500).json({ error: error.message });
         }
     },
 }

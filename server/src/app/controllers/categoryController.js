@@ -67,13 +67,14 @@ const categoryController = {
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const categories = await Category.find({ parentCategory: null }).lean().skip(skip).limit(limit);
-        
+            const totalCategories = await Category.countDocuments({ parentCategory: null });
+            const total = Math.ceil(totalCategories / limit);
             for (const parentCategory of categories) {
                 const subcategories = await Category.find({ parentCategory: parentCategory._id }).lean();
                 parentCategory.children = subcategories;
             }
         
-            res.status(200).json({ success: "Lấy tất cả danh mục cha thành công", data: categories });
+            res.status(200).json({ success: "Lấy tất cả danh mục cha thành công", data: categories, total: total });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -84,10 +85,11 @@ const categoryController = {
             const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
-
             const parentId  = req.params.id;  
+            const totalSubcategories = await Category.countDocuments({ parentCategory: parentId });
+            const total = Math.ceil(totalSubcategories / limit);
             const subcategories = await Category.find({ parentCategory: parentId }).skip(skip).limit(limit);
-            res.status(200).json({ success: "Lấy tất cả danh mục con theo cha thành công", data: subcategories });
+            res.status(200).json({ success: "Lấy tất cả danh mục con theo cha thành công", data: subcategories, total: total });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

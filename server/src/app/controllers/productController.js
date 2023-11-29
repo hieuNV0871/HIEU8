@@ -90,7 +90,8 @@ const productController = {
             const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
-        
+            const totalProducts = await Product.countDocuments();
+            const total = Math.ceil(totalProducts / limit);
             const products = await Product.find({})
               .populate('category', 'name')
               .populate('brand', 'name')
@@ -109,7 +110,7 @@ const productController = {
               images: product.images,
             }));
         
-            res.status(200).json({ success: "Lấy toàn bộ sản phẩm thành công", data: transformedProducts });
+            res.status(200).json({ success: "Lấy toàn bộ sản phẩm thành công", data: transformedProducts , total});
           } catch (error) {
             res.status(500).json({ error: error.message });
           }
@@ -161,20 +162,37 @@ const productController = {
     },
     getProductByParentCategory: async(req, res)=>{
         try {
-            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
+    
             const parentCategoryId = req.params.id;
             const parentCategory = await Category.findOne({ _id: parentCategoryId });
+    
             if (!parentCategory) {
                 return res.status(404).json({ message: 'Danh mục cha không tồn tại' });
             }
+    
             const subCategories = await Category.find({ parentCategory: parentCategory._id });
+    
+            const totalProducts = await Product.countDocuments({
+                category: { $in: [parentCategoryId, ...subCategories.map(sub => sub._id)] }
+            });
+            console.log(totalProducts);
+    
+            const totalPages = Math.ceil(totalProducts / limit);
+    
             const products = await Product.find({
                 category: { $in: [parentCategoryId, ...subCategories.map(sub => sub._id)] }
-            }).skip(skip).limit(limit);
+            })
+                .skip(skip)
+                .limit(limit);
     
-            res.status(200).json({ success: "Lấy sản phẩm thành công", data: products });
+            res.status(200).json({
+                success: "Lấy sản phẩm thành công",
+                data: products,
+                total: totalPages,
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

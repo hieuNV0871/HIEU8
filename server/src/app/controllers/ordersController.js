@@ -42,11 +42,11 @@ const ordersController = {
         0
       );
 
-      if (totalPrice !== cartTotalPrice) {
-        return res
-          .status(400)
-          .json({ error: "Tổng giá trị đơn hàng không khớp với giỏ hàng" });
-      }
+      // if (totalPrice !== cartTotalPrice) {
+      //   return res
+      //     .status(400)
+      //     .json({ error: "Tổng giá trị đơn hàng không khớp với giỏ hàng" });
+      // }
 
       await Cart.findOneAndUpdate(
         { user },
@@ -115,6 +115,7 @@ const ordersController = {
   getPersonalOrders: async (req, res) => {
     try {
       const user = req.user.id;
+      
       const Orderss = await Orders.find({ user })
         .populate({
           path: "ordersItems.product",
@@ -148,6 +149,8 @@ const ordersController = {
       const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
       const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
       const skip = (page - 1) * limit;
+      const totalOrders = await Orders.countDocuments();
+      const total = Math.ceil(totalOrders / limit);
       const Orderss = await Orders.find()
         .populate({
           path: "ordersItems.product",
@@ -171,7 +174,7 @@ const ordersController = {
         }).skip(skip).limit(limit);
       res
         .status(200)
-        .json({ success: "Lấy toàn bộ hoa don thành công", data: Orderss });
+        .json({ success: "Lấy toàn bộ hoa don thành công", data: Orderss , total});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
