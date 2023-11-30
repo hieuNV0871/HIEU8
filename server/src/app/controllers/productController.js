@@ -87,7 +87,7 @@ const productController = {
     // get
     getAllProduct: async(req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const totalProducts = await Product.countDocuments();
@@ -140,7 +140,7 @@ const productController = {
     },
     getProductBySubCategory: async(req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const id = req.params.id;
@@ -201,7 +201,7 @@ const productController = {
     searchProduct: async(req, res)=> {
         try {
             const keyword = req.query.keyword;
-            const limit = req.query.limit || null;
+            const limit = req.query.limit || 100;
             const results = await Product.find({
                 name: { $regex: new RegExp(keyword, 'i') }
             }).limit(limit);

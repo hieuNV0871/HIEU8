@@ -63,7 +63,7 @@ const CollectionController = {
 
     getAllCollection: async (req, res) => {
       try {
-        const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
+        const limit = parseInt(req.query.limit) || 100; // Default limit to 10 if not provided
         const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
         const skip = (page - 1) * limit;
     

@@ -63,11 +63,12 @@ const categoryController = {
    
     getAllParentCategory: async (req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const limit = parseInt(req.query.limit) || 100; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const categories = await Category.find({ parentCategory: null }).lean().skip(skip).limit(limit);
             const totalCategories = await Category.countDocuments({ parentCategory: null });
+            console.log(totalCategories);
             const total = Math.ceil(totalCategories / limit);
             for (const parentCategory of categories) {
                 const subcategories = await Category.find({ parentCategory: parentCategory._id }).lean();
@@ -82,7 +83,7 @@ const categoryController = {
 
     getAllSubCategoryByParent: async(req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || null; // Default limit to 10 if not provided
+            const limit = parseInt(req.query.limit) || 100; // Default limit to 10 if not provided
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const parentId  = req.params.id;  
