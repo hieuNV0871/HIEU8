@@ -68,12 +68,12 @@ const handleCreateOrders = async(value)=>{
         totalPrice: overallTotalPrice.value,
         ordersItems: extractedData
     }
-    const resPayment = await request.post("payment/momo", {order})
+    // const resPayment = await request.post("payment/momo", {order})
     // const resPayment2 = await request.post("payment/zalo", {order})
-    const url = resPayment.data.url
+    // const url = resPayment.data.url
     // console.log(resPayment2);
-    navigateTo(url, { external: true })
-    // const res =await request.post("orders/create", order)
+    // navigateTo(url, { external: true })
+    const res =await request.post("orders/create", order)
     // await cart.getCarts()
     // if(res.data.success){
     //     toast.add({ title: 'Đặt hàng thành công, bạn sẽ chuyển đến chi tiết đơn hàng', timeout: 1000 })

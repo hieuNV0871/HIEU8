@@ -37,7 +37,7 @@ const ordersSchema = new mongoose.Schema({
     },   
     paymentMethod: {
         type: String,
-        default: 'cash'
+        default: 'COD'
     },
     status: {
         type: Number,

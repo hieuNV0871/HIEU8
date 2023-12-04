@@ -10,8 +10,8 @@ router.post("/create", auth, authEmployee, brandController.createBrand)
 
 router.get("/get_all", brandController.getAllBrand)
 
-router.patch("/update/:id", auth, authEmployee, brandController.updateBrand)
+router.patch("/update/:id", auth, authEmployee,  brandController.updateBrand)
 
-router.delete("/delete/:id", auth, authEmployee, brandController.deleteOneBrand)
+router.delete("/delete/:id", auth, authEmployee,  brandController.deleteOneBrand)
 
 module.exports = router

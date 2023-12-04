@@ -94,12 +94,12 @@ const CollectionController = {
             totalCollections = await Collection.countDocuments();
         }
     
-        const totalPages = Math.ceil(totalCollections / limit);
+        // const totalPages = Math.ceil(totalCollections / limit);
     
         res.status(200).json({
             success: "Lấy tất cả bộ sưu tập thành công",
             data: collections,
-            total: totalPages,
+            total: totalCollections,
         });
     } catch (error) {
         res.status(500).json({ error: error.message });

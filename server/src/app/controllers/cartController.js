@@ -64,7 +64,7 @@ const cartController = {
               const variant = await VariantProduct.findById(newItem.variant);
 
               // Kiểm tra số lượng yêu cầu có lớn hơn số lượng có sẵn không
-              if (variant && (newItem.quantity + cart.cartItems[existingCartItemIndex].quantity) > variant.quantity -1) {
+              if (variant && (newItem.quantity + cart.cartItems[existingCartItemIndex].quantity) > variant.quantity) {
                   return res.status(400).json({ error: `Số lượng yêu cầu lớn hơn số lượng có sẵn cho sản phẩm ` });
               }
 

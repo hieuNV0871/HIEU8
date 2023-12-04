@@ -229,13 +229,13 @@ const validateEmail = (email) => {
       );
 }
 const createActiveToken = payload => {
-    return jwt.sign(payload, process.env.ACTIVE_TOKEN, {expiresIn: "100d"})
+    return jwt.sign(payload, process.env.ACTIVE_TOKEN, {expiresIn: "15m"})
 }
 const createAccessToken = payload => {
-    return jwt.sign(payload, process.env.ACCESS_TOKEN, {expiresIn: "100d"})
+    return jwt.sign(payload, process.env.ACCESS_TOKEN, {expiresIn: "5m"})
 }
 const createRefreshToken = payload => {
-    return jwt.sign(payload, process.env.REFRESH_TOKEN, {expiresIn: "100d"})
+    return jwt.sign(payload, process.env.REFRESH_TOKEN, {expiresIn: "15d"})
 }
 
 

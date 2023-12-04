@@ -43,12 +43,12 @@ const productController = {
                 variantProducts.push(variantProduct);
             }
             await VariantProduct.insertMany(variantProducts);
-            if(name||description||category||brand||price||images||variants ||collectionId){
-                const newProduct = await Product.findOneAndUpdate({_id}, {
-                    name, description, category, brand, collectionId, price, images
-                })
-                await newProduct.save();
-            }
+            // if(name||description||category||brand||price||images||variants ||collectionId){
+            //     const newProduct = await Product.findOneAndUpdate({_id}, {
+            //         name, description, category, brand, collectionId, price, images
+            //     })
+            //     await newProduct.save();
+            // }
             res.status(200).json({success: "Cập nhật sản phẩm thành công"})
         }catch (error) {
             res.status(500).json({error: error.message})
@@ -85,36 +85,43 @@ const productController = {
 		}
     },
     // get
-    getAllProduct: async(req, res) => {
+    getAllProduct: async (req, res) => {
         try {
-            const limit = parseInt(req.query.limit) || 10; // Default limit to 10 if not provided
-            const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
-            const skip = (page - 1) * limit;
-            const totalProducts = await Product.countDocuments();
-            const total = Math.ceil(totalProducts / limit);
-            const products = await Product.find({})
-              .populate('category', 'name')
-              .populate('brand', 'name')
-              .populate('collectionId', 'name')
-              .skip(skip)
-              .limit(limit);
-        
-            const transformedProducts = products.map(product => ({
-              productId: product._id,
-              name: product.name,
-              description: product.description,
-              category: product.category ? product.category.name : null,
-              brand: product.brand ? product.brand.name : null,
-              collectionId: product.collectionId ? product.collectionId.name : null,
-              price: product.price,
-              images: product.images,
-            }));
-        
-            res.status(200).json({ success: "Lấy toàn bộ sản phẩm thành công", data: transformedProducts , total});
-          } catch (error) {
-            res.status(500).json({ error: error.message });
-          }
-    },
+          const limit = parseInt(req.query.limit) || 10;
+          const page = parseInt(req.query.page) || 1;
+          const skip = (page - 1) * limit;
+          const keyword = req.query.keyword || '';
+          
+          // Tính total dựa trên sự có hoặc không có từ khóa tìm kiếm
+          const total = keyword
+            ? await Product.countDocuments({ name: { $regex: new RegExp(keyword, 'i') } })
+            : await Product.countDocuments();
+      
+          const products = await Product.find({
+            name: { $regex: new RegExp(keyword, 'i') }
+          })
+            .populate('category', 'name')
+            .populate('brand', 'name')
+            .populate('collectionId', 'name')
+            .skip(skip)
+            .limit(limit);
+      
+          const transformedProducts = products.map(product => ({
+            productId: product._id,
+            name: product.name,
+            description: product.description,
+            category: product.category ? product.category.name : null,
+            brand: product.brand ? product.brand.name : null,
+            collectionId: product.collectionId ? product.collectionId.name : null,
+            price: product.price,
+            images: product.images,
+          }));
+      
+          res.status(200).json({ success: "Lấy toàn bộ sản phẩm thành công", data: transformedProducts, total });
+        } catch (error) {
+          res.status(500).json({ error: error.message });
+        }
+      },
 
     getProductByID: async(req, res) => {
         try {
@@ -178,9 +185,7 @@ const productController = {
             const totalProducts = await Product.countDocuments({
                 category: { $in: [parentCategoryId, ...subCategories.map(sub => sub._id)] }
             });
-            console.log(totalProducts);
     
-            const totalPages = Math.ceil(totalProducts / limit);
     
             const products = await Product.find({
                 category: { $in: [parentCategoryId, ...subCategories.map(sub => sub._id)] }
@@ -191,7 +196,7 @@ const productController = {
             res.status(200).json({
                 success: "Lấy sản phẩm thành công",
                 data: products,
-                total: totalPages,
+                total: totalProducts,
             });
         } catch (error) {
             res.status(500).json({ error: error.message });

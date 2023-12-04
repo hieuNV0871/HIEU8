@@ -10,6 +10,7 @@ const newsRouter = require('./news')
 const userRouter = require('./user')
 const ordersRouter = require('./orders')
 const cartRouter = require('./cart')
+const paymentRouter = require('./payment')
 function route(app) {
     app.use('/v1/auth', authRouter)
     app.use('/v1/upload', uploadRouter)
@@ -21,6 +22,7 @@ function route(app) {
     app.use('/v1/news', newsRouter)
     app.use('/v1/user', userRouter)
     app.use('/v1/cart', cartRouter)
+    app.use('/v1/payment', paymentRouter)
 
 
     app.use((req, res, next) => {

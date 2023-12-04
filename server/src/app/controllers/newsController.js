@@ -40,9 +40,8 @@ const newsController = {
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const totalNews = await News.countDocuments();
-            const total = Math.ceil(totalNews / limit);
             const news = await News.find().skip(skip).limit(limit)
-            res.status(200).json({success: "Lấy tất cả bài viết thành công", data: news, total})
+            res.status(200).json({success: "Lấy tất cả bài viết thành công", data: news, total: totalNews})
         } catch (error) {
             res.status(500).json({error: error.message})
         }

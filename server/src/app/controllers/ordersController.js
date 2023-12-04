@@ -150,7 +150,6 @@ const ordersController = {
       const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
       const skip = (page - 1) * limit;
       const totalOrders = await Orders.countDocuments();
-      const total = Math.ceil(totalOrders / limit);
       const Orderss = await Orders.find()
         .populate({
           path: "ordersItems.product",
@@ -174,7 +173,7 @@ const ordersController = {
         }).skip(skip).limit(limit);
       res
         .status(200)
-        .json({ success: "Lấy toàn bộ hoa don thành công", data: Orderss , total});
+        .json({ success: "Lấy toàn bộ hoa don thành công", data: Orderss , total:totalOrders});
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -6,8 +6,8 @@ const auth = require("../app/middleware/auth")
 const authEmployee = require("../app/middleware/authEmployee")
 
 
-router.post("/create", auth, authEmployee, productController.createProduct)
-router.patch("/update/:id", auth, authEmployee, productController.updateProduct)
+router.post("/create",auth, authEmployee, productController.createProduct)
+router.patch("/update/:id",auth, authEmployee, productController.updateProduct)
 
 router.get("/getAllProduct", productController.getAllProduct)
 router.get("/getProductById/:id",  productController.getProductByID)

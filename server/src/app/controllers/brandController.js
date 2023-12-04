@@ -41,9 +41,8 @@ const brandController = {
             const page = parseInt(req.query.page) || 1; // Default page to 1 if not provided
             const skip = (page - 1) * limit;
             const totalBrands = await brand.countDocuments();
-            const total = Math.ceil(totalBrands / limit);
             const brands = await brand.find().skip(skip).limit(limit);
-            res.status(200).json({success: "Lấy thương hiệu con thành công", data: brands, total:total})
+            res.status(200).json({success: "Lấy thương hiệu con thành công", data: brands, total:totalBrands})
         } catch (error) {
             res.status(500).json({error: error.message})
             
