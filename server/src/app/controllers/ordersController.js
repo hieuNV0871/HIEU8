@@ -47,7 +47,18 @@ const ordersController = {
       //     .status(400)
       //     .json({ error: "Tổng giá trị đơn hàng không khớp với giỏ hàng" });
       // }
+      const itemsExistInCart = ordersItems.every((item) => {
+        const foundCartItem = cartPrice.cartItems.find(
+          (cartItem) => cartItem.product._id.toString() === item.product
+        );
+        return foundCartItem && foundCartItem.quantity >= item.quantity;
+      });
 
+      if (!itemsExistInCart) {
+        return res
+          .status(400)
+          .json({ error: "Một số sản phẩm không tồn tại trong giỏ hàng hoặc số lượng không đủ" });
+      }
       await Cart.findOneAndUpdate(
         { user },
         {

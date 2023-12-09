@@ -9,11 +9,11 @@ const brandSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    // slug: {
-    //     type: String,
-    //     slug: 'name',
-    //     unique: true
-    // },
+    slug: {
+        type: String,
+        slug: 'name',
+        unique: true
+    },
     position: {
         type: Number,
         default: 0

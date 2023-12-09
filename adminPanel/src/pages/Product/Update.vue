@@ -21,7 +21,7 @@
           name="price"
           :rules="[{ required: true, message: 'Please input your Price!' }]"
         >
-          <a-input-number size="large" v-model:value="formState.price" />
+          <a-input-number size="large" :min="1" v-model:value="formState.price" />
         </a-form-item>
 
         <a-form-item name="category" label="Category">
@@ -146,6 +146,7 @@
                 v-model:value="variant.quantity"
                 size="large"
                 placeholder="quantity"
+                :min="1"
               />
             </a-form-item>
             <MinusCircleOutlined
@@ -195,13 +196,13 @@ const formState = ref({
   category: "",
   brand: "",
   collectionId: "",
-  price: 0,
+  price: 1,
   images: [],
   variants: [
     {
       sizeId: null,
       colorId: null,
-      quantity: null,
+      quantity: 1,
       key: Date.now(),
     },
   ],

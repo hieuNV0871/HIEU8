@@ -21,7 +21,7 @@
           name="price"
           :rules="[{ required: true, message: 'Please input your Price!' }]"
         >
-          <a-input-number size="large" v-model:value="formState.price" />
+          <a-input-number :min="1" size="large" v-model:value="formState.price" />
         </a-form-item>
 
         <a-form-item name="category" label="Category">
@@ -98,7 +98,73 @@
         <a-form-item label="Description" name="description">
           <ckeditor :editor="editor" v-model="formState.description" />
         </a-form-item>
-
+        <div class="mb-[5px]">Variant</div>
+        <div class="flex flex-col">
+          <a-space
+            v-for="(variant, index) in formState.variants"
+            :key="variant.key"
+          >
+            <a-form-item
+              :name="['variants', index, 'colorId']"
+              :rules="{
+                required: true,
+                message: 'color can not be null',
+                trigger: 'change',
+              }"
+            >
+              <a-select
+                v-model:value="variant.colorId"
+                show-search
+                size="large"
+                class="min-w-[150px]"
+                placeholder="Select a color"
+                :options="color"
+                :filter-option="filterOption"
+              ></a-select>
+            </a-form-item>
+            <a-form-item
+              :name="['variants', index, 'sizeId']"
+              :rules="{
+                required: true,
+                message: 'size can not be null',
+                trigger: 'change',
+              }"
+            >
+              <a-select
+                v-model:value="variant.sizeId"
+                show-search
+                size="large"
+                class="min-w-[150px]"
+                placeholder="Select a size"
+                :options="size"
+                :filter-option="filterOption"
+              ></a-select>
+            </a-form-item>
+            <a-form-item
+              :name="['variants', index, 'quantity']"
+              :rules="{
+                required: true,
+                message: 'quantity can not be null',
+                trigger: 'change',
+              }"
+            >
+              <a-input-number
+                v-model:value="variant.quantity"
+                size="large"
+                placeholder="quantity"
+                :min="1"
+              />
+            </a-form-item>
+            <MinusCircleOutlined
+              v-if="index > 0"
+              class="dynamic-delete-button"
+              @click="removeVariant(variant.key)"
+            />
+          </a-space>
+        </div>
+        <a-form-item>
+          <a-button size="large" @click="addVariant"> + variant </a-button>
+        </a-form-item>
         <a-form-item>
           <a-button type="primary" html-type="submit">Add Product</a-button>
         </a-form-item>
@@ -109,23 +175,33 @@
 
 <script setup>
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons-vue";
+import { PlusOutlined, LoadingOutlined, MinusCircleOutlined } from "@ant-design/icons-vue";
 import { uploadImage, uploadImages } from "../../request/upload.api.js";
 import { getAll } from "../../request/brand";
 import { getAllCategory } from "../../request/category.api";
 import { getAllCollection } from "../../request/collection";
 import { onMounted, ref } from "vue";
-import { createProduct } from "../../request/product.api";
+import { createProduct, getAllColor, getAllSize } from "../../request/product.api";
 import { useRouter } from "vue-router";
 const editor = ref(ClassicEditor);
+const color = ref([]);
+const size = ref([]);
 const formState = ref({
   name: "",
   description: "",
   category: "",
   brand: "",
   collectionId: "",
-  price: 0,
+  price: 1,
   images: [],
+  variants: [
+    {
+      sizeId: null,
+      colorId: null,
+      quantity: 1,
+      key: Date.now(),
+    },
+  ],
 });
 const loading = ref(false);
 const brand = ref([]);
@@ -141,11 +217,25 @@ const onFinish = async (values) => {
     })),
   };
   try {
+    console.log(data);
     await createProduct(data);
     router.push("/product");
   } catch (error) {
     console.log(error);
   }
+};
+const addVariant = () => {
+  formState.value.variants.push({
+    color: "",
+    size: "",
+    quantity: 0,
+    key: Date.now(),
+  });
+};
+const removeVariant = (key) => {
+  formState.value.variants = formState.value.variants.filter(
+    (e) => e.key !== key
+  );
 };
 const filterOption = (input, option) => {
   return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
@@ -241,10 +331,34 @@ const getAllBrand = async () => {
     console.log(error);
   }
 };
+const getColor = async () => {
+  try {
+    const { data } = await getAllColor();
+    color.value = data.data.map((e) => ({
+      label: e.name,
+      value: e._id,
+    }));
+  } catch (error) {
+    console.log(error);
+  }
+};
 
+const getSize = async () => {
+  try {
+    const { data } = await getAllSize();
+    size.value = data.data.map((e) => ({
+      label: e.name,
+      value: e._id,
+    }));
+  } catch (error) {
+    console.log(error);
+  }
+};
 onMounted(() => {
   getAllBrand();
   getAllCategoryData();
   getAllCollectionData();
+  getSize()
+  getColor()
 });
 </script>
