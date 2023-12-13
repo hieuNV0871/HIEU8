@@ -46,8 +46,10 @@ import {
 } from "../request/news";
 import { ref, reactive, inject, onBeforeMount, watch } from "vue";
 import { message } from "ant-design-vue";
+import {authStore} from '../stores/auth'
 const modalNews = ref(null);
 const user = inject("user");
+const auth = authStore()
 const show = ref(false);
 const title = ref("");
 const buttonText = ref("");
@@ -94,7 +96,7 @@ const create = async (data) => {
     const res = await createNews({
       title: data.titleNews,
       content: data.editorNews,
-      author: user?.value?.username,
+      author: auth.authUser.username,
       publishedAt: new Date(),
     });
     if (res?.status == 200) {
@@ -110,6 +112,7 @@ const update = async (data) => {
   try {
     const res = await updateNews(data.id, {
       title: data.titleNews,
+      author: auth.authUser.username,
       content: data.editorNews,
     });
     if (res?.status == 200) {

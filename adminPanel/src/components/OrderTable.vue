@@ -31,6 +31,10 @@
                 ? "Đã giao cho shipper"
                 : record.status == 2
                 ? "Đang giao hàng"
+                : record.status == -1
+                ? "Đã hủy"
+                : record.status == 999
+                ? "Đang chờ" // chờ vnpay result
                 : "Thành công"
             }}
           </a-tag>
@@ -81,9 +85,9 @@ const emit = defineEmits(["open-update"]);
 
 const columns = [
   {
-    title: "Họ tên",
-    dataIndex: "user?.name",
-    key: "user?.name",
+    title: "Mã đơn",
+    dataIndex: "_id",
+    key: "_id",
   },
   {
     title: "Địa chỉ",
@@ -135,5 +139,5 @@ const innerColumns = [
 const openUpdate = (id) => {
   emit("open-update", id);
 };
-const color = ref(["blue", "orange", "red", "green"]);
+const color = ref(["blue", "orange","green", "red", "green"]);
 </script>

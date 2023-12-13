@@ -3,7 +3,7 @@
         <UContainer>
             <div>
                 <div>
-                    <!-- {{ cart.carts }} -->
+                    {{ cart.itemsToCheckout }}
                 </div>
                 <div>
                     <UForm :state="state" class="space-y-4" @submit="handleCreateOrders">
@@ -20,6 +20,7 @@
                         <UButton type="submit">
                             Đặt hàng
                         </UButton>
+                        {{ overallTotalPrice }}
                     </UForm>
                 </div>
             </div>
@@ -52,9 +53,12 @@ const state = ref({
     address: undefined,
     phoneNumber: undefined,
 })
-const paymentMethods = ['COD', 'MOMO']
+const paymentMethods = ref(['COD', 'MOMO'])
 
 const paymentMethod = ref('COD')
+
+const itemsToCheckout = ref([]);
+
 
 
 const handleCreateOrders = async(value)=>{
@@ -64,16 +68,33 @@ const handleCreateOrders = async(value)=>{
         address: value.data.address,
         phone: value.data.phoneNumber,
         paymentMethod: paymentMethod.value,
-        status: 0,
+        status: paymentMethod.value === 'MOMO' ? 999 : 0,
         totalPrice: overallTotalPrice.value,
         ordersItems: extractedData
+    }
+    console.log(order);
+    const res = await request.post("orders/create", order)
+    const orderId = res.data.data._id
+    if(paymentMethod.value === 'MOMO'){
+      const reqData = {
+        amount: overallTotalPrice.value,
+        bankCode: 'NCB',
+        orderDescription: "Thanh toan don hang cho cua hang NVH-SHOP",
+        orderType: "other",
+        language: "vn",
+        orderId
+      }
+      console.log(reqData);
+      const resUrl = await request.post("payment/create_payment_url", reqData )
+      const url = resUrl.data.url
+      navigateTo(url,{external:true} )
     }
     // const resPayment = await request.post("payment/momo", {order})
     // const resPayment2 = await request.post("payment/zalo", {order})
     // const url = resPayment.data.url
     // console.log(resPayment2);
     // navigateTo(url, { external: true })
-    const res =await request.post("orders/create", order)
+    // const res =await request.post("orders/create", order)
     // await cart.getCarts()
     // if(res.data.success){
     //     toast.add({ title: 'Đặt hàng thành công, bạn sẽ chuyển đến chi tiết đơn hàng', timeout: 1000 })
@@ -82,7 +103,7 @@ const handleCreateOrders = async(value)=>{
     // }
 }
 
-const extractedData = cart.carts.cartItems.map(item => ({
+const extractedData = cart.itemsToCheckout.map(item => ({
   product: item.product,
   variant: item.variant._id,
   quantity: item.quantity
@@ -98,7 +119,14 @@ const calculateOverallTotalPrice = (cartItems) => {
 };
 
 const overallTotalPrice = computed(() => {
-  return calculateOverallTotalPrice(cart.carts.cartItems);
+  return calculateOverallTotalPrice(cart.itemsToCheckout);
 });
+
+
 </script>
+
+
+<style>
+
+</style>
 

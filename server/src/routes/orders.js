@@ -2,7 +2,7 @@ const router = require("express").Router()
 
 const ordersController = require("../app/controllers/ordersController")
 const auth = require("../app/middleware/auth")
-const authEmployee = require("../app/middleware/authAdmin")
+const authEmployee = require("../app/middleware/authEmployee")
 
 router.post("/create",  ordersController.createOrders)
 router.get("/getAll", auth, authEmployee, ordersController.getAllOrders)

@@ -40,82 +40,90 @@
                         <span>{{ Number(product.price).toLocaleString() }} đ</span>
                     </div>
                     <div>
-                        <h3>SKU: <span>{{sku}}</span></h3>
+                        <h3>SKU: <span class="font-semibold">{{sku ? sku : product.sku}}</span></h3>
                     </div>
-                    <div v-if="colors.length">
-                        <h3>Chọn màu sắc:</h3>
-                        <label
-                            v-for="(item, index) in colors"
-                            :key="index"
-                            :class="item.label === selectedColor ? 'border-primary' : ''"
-                            class="color-option mr-5 btn inline-block border cursor-pointer hover:border-primary"
-                            :for="item.label"
-                            @change="handleChooseColor"
-                        >
-                            <input
-                            type="radio"
-                            :id="item.label"
-                            v-model="selectedColor"
-                            name="color"
-                            :value="item.label"
-                            class="hidden"
+                    <div v-if="totalQuantity > 0">
+                        <div v-if="colors.length" class="my-3">
+                            <h3>Chọn màu sắc:</h3>
+                            <label
+                                v-for="(item, index) in colors"
+                                :key="index"
+                                :class="item.label === selectedColor ? 'border-primary' : ''"
+                                class="color-option p-1 mr-5 btn inline-block border cursor-pointer hover:border-primary"
+                                :for="item.label"
+                                @change="handleChooseColor"
+                            >
+                                <input
+                                type="radio"
+                                :id="item.label"
+                                v-model="selectedColor"
+                                name="color"
+                                :value="item.label"
+                                class="hidden"
+                                />
+                                {{ item.label }}
+                            </label>
+                        </div>
+                        <div v-if="sizes.length" class="my-3">
+                            <h3>Chọn kích cỡ:</h3>
+                            <label
+                                v-for="(item, index) in sizes"
+                                :key="index"
+                                v-bind:class="item.label === selectedSize ? 'border-primary' : ''"
+                                class="color-option mr-5 btn inline-block border p-1 "
+                                :class="
+                                !enableSizes.includes(item.label) || !selectedColor //css
+                                ? 'opacity-50 cursor-not-allowed  border hover:border-gray-200'
+                                    : 'hover:border-primary cursor-pointer'
+                                "
+                                :for="item.label"
+                            >
+                                <input
+                                type="radio"
+                                :id="item.label"
+                                v-model="selectedSize"
+                                name="size"
+                                :value="item.label"
+                                class="hidden"
+                                @change="handleChooseSize"
+                                :disabled="!enableSizes.includes(item.label) || !selectedColor"
+                                />
+                                {{ item.label }}
+                            </label>
+                        </div>
+                        <div class="flex my-3">
+                            <UButton
+                                icon="i-heroicons-minus"
+                                size="xs"
+                                color="primary"
+                                square
+                                variant="outline"
+                                @click="handleChangeSelectedQuantity('minus')"
                             />
-                            {{ item.label }}
-                        </label>
-                    </div>
-                    <div v-if="sizes.length">
-                        <h3>Chọn kích cỡ:</h3>
-                        <label
-                            v-for="(item, index) in sizes"
-                            :key="index"
-                            v-bind:class="item.label === selectedSize ? 'border-primary' : ''"
-                            class="color-option mr-5 btn inline-block border  "
-                            :class="
-                            !enableSizes.includes(item.label) || !selectedColor //css
-                            ? 'opacity-50 cursor-not-allowed  border hover:border-gray-200'
-                                : 'hover:border-primary cursor-pointer'
-                            "
-                            :for="item.label"
-                        >
-                            <input
-                            type="radio"
-                            :id="item.label"
-                            v-model="selectedSize"
-                            name="size"
-                            :value="item.label"
-                            class="hidden"
-                            @change="handleChooseSize"
-                            :disabled="!enableSizes.includes(item.label) || !selectedColor"
+                            <UInput class="w-[100px] text-center mx-2" @change="handleValidateQuantity" size="sm" v-model="selectedQuantity"/>
+                            <UButton
+                                icon="i-heroicons-plus"
+                                size="xs"
+                                color="primary"
+                                square
+                                variant="outline"
+                                @click="handleChangeSelectedQuantity('plus')"
                             />
-                            {{ item.label }}
-                        </label>
+                        </div>
+                        <div>
+                            <span>{{ selectedSize ? `Số lượng còn lại: ${quantity}` : totalQuantity===0 ? "het hang":`tong con: ${totalQuantity}` }}</span>
+                        </div>
+                        <!-- {{ selectedQuantity }} -->
+                        <UButton @click="handleAddProductToCart" class="my-2">
+                            Thêm vào giỏ hàng
+                        </UButton>
                     </div>
-                    <div class="flex">
-                        <UButton
-                            icon="i-heroicons-minus"
-                            size="xs"
-                            color="primary"
-                            square
-                            variant="outline"
-                            @click="handleChangeSelectedQuantity('minus')"
-                        />
-                        <UInput class="w-[100px] text-center mx-2" @change="handleValidateQuantity" size="sm" v-model="selectedQuantity"/>
-                        <UButton
-                            icon="i-heroicons-plus"
-                            size="xs"
-                            color="primary"
-                            square
-                            variant="outline"
-                            @click="handleChangeSelectedQuantity('plus')"
-                        />
+                    <div v-else>
+                        ops! hết hàng, chọn sản phẩm khác 
+                        <UButton to="/collections">
+                            Tại đây
+                        </UButton>
                     </div>
-                    <div>
-                        <span>{{ selectedSize ? `Số lượng còn lại: ${quantity}` : totalQuantity===0 ? "het hang":`tong con: ${totalQuantity}` }}</span>
-                    </div>
-                    {{ selectedQuantity }}
-                    <UButton @click="handleAddProductToCart">
-                        add
-                    </UButton>
                 </div>
                 <!-- end detail -->
             </div>
@@ -173,6 +181,7 @@ const handleChooseSize = ()=>{
 }
 
 const handleChooseColor = ()=>{
+
     selectedQuantity.value = 1
     selectedSize.value = null
     sku.value = ''
@@ -194,10 +203,19 @@ enableSizes.value =filteredSizes
 const handleChangeSelectedQuantity = type => {
     const isPlus = type === "plus";
     const isSubtract = type === "minus";
+    if(!selectedColor.value || !selectedSize.value){
+        toast.add({ title: "Vui lòng chọn phân loại trước", color:"red", timeout: 2000 })
+        return
+    }
     if (isPlus && selectedQuantity.value < quantity.value) {
         selectedQuantity.value += 1;
-    } else if (isSubtract && selectedQuantity.value > 1) {
+    }else if(isPlus && selectedQuantity.value >= quantity.value){
+        toast.add({ title: "Đã đạt giới hạn số lượng trong kho", color:"red", timeout: 2000 })
+    }
+     else if (isSubtract && selectedQuantity.value > 1) {
         selectedQuantity.value -= 1;
+    }else{
+        toast.add({ title: "Tối thiểu là 1 sản phẩm", color:"red", timeout: 2000 })
     }
 }
 const handleValidateQuantity = () => {

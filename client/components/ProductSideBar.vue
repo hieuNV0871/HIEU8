@@ -3,6 +3,14 @@
         <div class="w-[200px]">
                 <UAccordion v-if="items.length" :items="items" color="black" variant="soft">
                     <template #item="{ item }">
+                      <ULink
+                        :to="item.toTrigger"
+                        active-class="text-primary"
+                        inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                        >
+                        xem tất cả
+                        <!-- {{ subCategory.name }} -->
+                        </ULink>
                     <div v-for="(subCategory, index) in item.children" :key="index">
                         <ULink
                         :to="subCategory.to"
@@ -82,6 +90,7 @@ const getParentCategory = async () => {
     const parentCategories = res.data.data;
     const mappedCategories = parentCategories.map(category => ({
       label: category.name,
+      toTrigger: "/collections/" + category._id,
       icon: '',
       defaultOpen: false,
       children: category.children.map(child => ({

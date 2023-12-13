@@ -24,7 +24,7 @@
                     
                 </div>
                 <div class="flex flex-col justify-center">
-                    <h3 class="text-center">co {{ searchResults.length }} ket qua cho {{ searchKeyWord }}</h3>
+                    <h3 class="text-center">có <span class="font-semibold">{{ searchResults.length }}</span>  kết quả cho <span class="font-semibold">"{{ searchKeyWord }}"</span></h3>
                     <ULink
                       class="hover:underline"
                     >
@@ -34,7 +34,7 @@
 
           </div>
           <div v-else-if="searchResults.length <= 0" class="px-2 py-3 w-[200px]">
-            <h3 v-if="searchKeyWord" class="px-3">Không tìm thấy kết quả cho "{{ searchKeyWord }}"</h3>
+            <h3 v-if="searchKeyWord" class="px-3">Không tìm thấy kết quả cho "<span class="font-semibold">{{ searchKeyWord }}</span>"</h3>
             <h3 v-else class="px-3">Nhập từ khóa để tìm kiếm</h3>
             </div>
         </template>

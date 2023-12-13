@@ -42,6 +42,8 @@ const auth = authStore()
 const onFinish = async (values) => {
    try {
     await auth.login(values)
+
+  // await auth.getUserInfo()
     // localStorage.setItem('token', data.refreshToken)
     // localStorage.setItem('id', data.user._id)
     router.push('/')

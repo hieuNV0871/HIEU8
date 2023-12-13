@@ -25,7 +25,8 @@ activeEmail()
 <template>
     <MainLayout>
         <div>
-            activated
+            <!-- activated -->
+            activating
         </div>
     </MainLayout>
 </template>

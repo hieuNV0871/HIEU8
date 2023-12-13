@@ -1,6 +1,8 @@
 <template>
   <div>
     <div class="font-bold text-[18px]">QUẢN LÝ ĐƠN HÀNG</div>
+    <a-button type="primary" @click="addOrders">add</a-button>
+
     <div>
       <OrderTable
         :data="listData"
@@ -37,6 +39,9 @@ import OrderTable from "../components/OrderTable.vue";
 import { ref, reactive, onBeforeMount, watch } from "vue";
 import { message } from "ant-design-vue";
 import * as ApiOrder from "../request/order.js";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 const show = ref(false);
 const listData = ref([]);
 const formState = reactive({
@@ -125,5 +130,13 @@ const options = ref([
     value: 3,
     label: "Thành công",
   },
+  {
+    value: -1,
+    label: "Hủy",
+  },
 ]);
+
+const addOrders = () => {
+  router.push("/add-orders");
+};
 </script>

@@ -9,6 +9,11 @@ const productSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    sku: {
+        type: String,
+        require: true,
+        unique: true
+    },
     description: {
         type: String,
         required: true,

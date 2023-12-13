@@ -1,4 +1,6 @@
 <template>
+  <h3 @click="()=>router.push('/product')" class="underline cursor-pointer">Danh sách sản phẩm</h3>
+
   <div class="flex justify-center">
     <div class="max-w-[700px]">
       <a-form
@@ -237,7 +239,7 @@ const addVariant = () => {
   formState.value.variants.push({
     color: "",
     size: "",
-    quantity: 0,
+    quantity: 1,
     key: Date.now(),
   });
 };

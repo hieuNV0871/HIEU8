@@ -1,7 +1,7 @@
 <template>
       <MainLayout>
           <UContainer>
-            <!-- {{ itemsToCheckout }} -->
+            {{ itemsToCheckout }}
             <div class="flex justify-between gap-x-5 my-20 p-10" v-if="cart.carts.cartItems.length">
                 <div class="w-1/4 h-full flex flex-col gap-y-3 px-5 py-2 bg-white shadow-2xl rounded">
                   <span
@@ -14,7 +14,7 @@
                     <span class="text-primary">{{overallTotalPrice.toLocaleString()}}đ</span></span
                   >
                   <div class="flex flex-col gap-y-2 items-center">
-                    <UButton variant="outline" to="/checkout">Đặt hàng ngay</UButton>
+                    <UButton variant="outline" @click="handlePassData">Đặt hàng ngay</UButton>
                     <UButton variant="outline" to="/collections">Mua thêm sản phẩm</UButton>
                   </div>
                 </div>
@@ -101,7 +101,6 @@
 <script setup>
 import MainLayout from '../layouts/MainLayout.vue';
 import {cartStore} from '../../stores/cart';
-import { provide } from 'vue';
 const cart = cartStore()
 definePageMeta({
 middleware: [
@@ -120,23 +119,23 @@ return {
 const toast = useToast()
 const itemsSelected = ref([]);
 const selectedAll = ref(true);
-
 const itemsToCheckout = ref(cart.carts.cartItems)
-
-
-
-
 
 const handleChangeSelectedQuantity =  async(id, type) => {
     const cartItem  = cart.carts.cartItems.find(item=>item._id === id)
     const isPlus = type === "plus";
     const isSubtract = type === "minus";
-    console.log(cartItem);
+    console.log(id);
     if (isPlus && cartItem.quantity < cartItem.variant.quantity) {
-        cartItem.quantity += 1;
-    } else if (isSubtract && cartItem.quantity > 1) {
+        cartItem.quantity ++;
+    }else if(isPlus && cartItem.quantity >= cartItem.variant.quantity){
+      toast.add({ title: "Số lượng trong kho không đủ", color: 'red', timeout: 1000 })
+    }
+     else if (isSubtract && cartItem.quantity > 1) {
        
       cartItem.quantity -= 1;
+    }else{
+      toast.add({ title: "Tối thiểu là 1, nếu muốn xóa click vào icon thùng rác", color: 'red', timeout: 1000 })
     }
     const newCartItem =
     {
@@ -158,9 +157,13 @@ const handleValidateQuantity = async(id) => {
   const regex = /^[0-9]+$/;
   if (!regex.test(cartItem.quantity) || cartItem.quantity < 1) {
     cartItem.quantity = 1;
+    toast.add({ title: "Tối thiểu là 1, nếu muốn xóa click vào icon thùng rác", color: 'red', timeout: 1000 })
+
   }
   if ( cartItem.quantity  >= cartItem.variant.quantity) {
     cartItem.quantity = cartItem.variant.quantity
+    toast.add({ title: "Đã đạt số lượng tối đa trong kho", color: 'red', timeout: 1000 })
+
   }
   const newCartItem =
     {
@@ -231,5 +234,12 @@ const overallTotalPrice = computed(() => {
     return total + calculateTotalPrice(item);
   }, 0);
 });
+
+const handlePassData = () =>{
+  cart.setItemToCheckout(itemsToCheckout.value)
+  // cart.itemsToCheckout = itemsToCheckout.value
+  navigateTo('/checkout')
+}
+
 </script>
 

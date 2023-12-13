@@ -37,7 +37,7 @@
                   khong co
                 </div>
                 
-                <UPagination v-if="filteredProducts.length" class="m-10" size="sm" v-model="page" :page-count="pageCount" :total="totalPage" show-last show-first />
+                <UPagination  class="m-10" size="sm" v-model="page" :page-count="pageCount" :total="totalPage" show-last show-first />
               </div>
             </div>
           </UContainer>
@@ -71,8 +71,7 @@ const pageCount = ref(8)
 const products = ref([
   
 ])
-
-
+const allProducts = ref([])
 const totalPage = ref(1)
 
 const getAllProduct = async (pa, paCo)=>{
@@ -113,13 +112,17 @@ const filteredProducts = computed(() => {
   });
 });
 
+const getAll = async ()=>{
+  const res = await request.get('product/getAllProduct')
+  totalPage.value = res.data.data.length
+}
 
-
-watch(() => {
-  getTotalPage()
+watchEffect(() => {
+  // getTotalPage()
   getAllProduct(page.value, pageCount.value);
 });
 
+getAll()
 
 </script>
 

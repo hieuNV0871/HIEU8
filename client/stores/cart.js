@@ -1,11 +1,18 @@
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import request from "../utils/request";
+import { ref, computed } from "vue";
+
 
 export const cartStore = defineStore("cart", () => {
   
-    const carts = useLocalStorage("Cart", [])
+    const carts = useLocalStorage("Cart", {})
+    const itemsToCheckout = useLocalStorage('itemsToCheckout', [])
     let errorMessage = ref("");
+
+    const setItemToCheckout = (item)=>{
+      itemsToCheckout.value = item
+    }
     const addToCart = async (cart) => {
       errorMessage.value = ""
       try {
@@ -36,6 +43,8 @@ export const cartStore = defineStore("cart", () => {
     getCarts,
     updateCartItem,
     removeCartItem,
+    setItemToCheckout,
+    itemsToCheckout,
     errorMessage
   };
 });

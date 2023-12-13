@@ -13,8 +13,11 @@ const productController = {
             const variantProducts = [];
             const product = await Product.findOne({name})
             if(product) return res.status(400).json({error: "Sản phẩm đã tồn tại"})
+            const cvtName = name.split(' ').map((word, index, array) => index === array.length - 1 ? word : word.charAt(0)).join('');
+            let skuProduct  = "NVH" + cvtName
             const newProduct = new Product({
         name,
+        sku: skuProduct,
         description,
         category,
         brand,
@@ -27,7 +30,7 @@ const productController = {
     for (const variant of variants) {
         const size = await SizeProduct.findById(variant.sizeId);
         const color = await ColorProduct.findById(variant.colorId);
-        const sku = `NVH${size.name}${color.name}`;
+        const sku = `${skuProduct}${size.name}${color.name}`;
     
         const variantKey = `${variant.sizeId}-${variant.colorId}`;
         if (variant.quantity <= 0) {
@@ -66,7 +69,8 @@ const productController = {
     
             const existingVariants = new Set();
             const variantProducts = [];
-    
+            const cvtName = name.split(' ').map(tu =>tu.charAt(0)).join('')
+            let skuProduct  = "NVH"+ cvtName
             // Lấy danh sách biến thể hiện tại của sản phẩm
             const currentVariants = await VariantProduct.find({ productId: productId });
     
@@ -75,11 +79,11 @@ const productController = {
                 const variantKey = `${variant.sizeId}-${variant.colorId}`;
                 existingVariants.add(variantKey);
             });
-    
+            
             for (const variant of variants) {
                 const size = await SizeProduct.findById(variant.sizeId);
                 const color = await ColorProduct.findById(variant.colorId);
-                const sku = `NVH${size.name}${color.name}`;
+                const sku = `${skuProduct}${size.name}${color.name}`;
     
                 const variantKey = `${variant.sizeId}-${variant.colorId}`;
     
@@ -112,6 +116,7 @@ const productController = {
             // Cập nhật thông tin cơ bản của sản phẩm
             await Product.findByIdAndUpdate(productId, {
                 name: name,
+                sku: skuProduct,
                 description: description,
                 category: category,
                 brand: brand,
@@ -182,6 +187,7 @@ const productController = {
           const transformedProducts = products.map(product => ({
             productId: product._id,
             name: product.name,
+            sku: product.sku,
             description: product.description,
             category: product.category ? product.category.name : null,
             brand: product.brand ? product.brand.name : null,
@@ -275,7 +281,37 @@ const productController = {
             res.status(500).json({ error: error.message });
         }
     },
-
+    getProductByCategory: async(req, res)=>{
+        try {
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
+            const skip = (page - 1) * limit;
+            const id = req.params.id;
+        
+            // Kiểm tra xem danh mục có phải là danh mục cha không
+            const isParentCategory = await Category.findOne({ _id: id, parentCategory: null });
+            let query = {};
+            if (isParentCategory) {
+                // Nếu là danh mục cha, lấy tất cả sản phẩm của các danh mục con
+                const subcategories = await Category.find({ parentCategory: id }, '_id');
+                const subcategoryIds = subcategories.map(subcategory => subcategory._id);
+                query = { category: { $in: [...subcategoryIds, id] } };
+            } else {
+                // Nếu là danh mục con, chỉ lấy sản phẩm của danh mục đó
+                query = { category: id };
+            }
+        
+            const products = await Product.find(query)
+                    .populate('category', 'name')
+                    .populate('brand', 'name')
+                    .populate('collectionId', 'name')
+                    .skip(skip)
+                    .limit(limit);
+            res.status(200).json({ success: "Lấy sản phẩm thành công", data: products });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
     searchProduct: async(req, res)=> {
         try {
             const keyword = req.query.keyword;
@@ -319,6 +355,54 @@ const productController = {
             res.status(500).json({ error: error.message })
           }
     },
+    getDetailProductBySku: async(req, res)=>{
+        try {
+            const { reqSku } = req.body;
+            console.log(reqSku);
+            let reqSkus = reqSku.map((r) => r.skuCode); // Lấy ra mảng skuCode từ reqSku
+            const variants = await VariantProduct.find({ sku: { $in: reqSkus } });
+            let products = [];
+            let notFoundSkus = [];
+            let total = 0;
+    
+            for (const variant of variants) {
+                // Tìm quantity tương ứng với skuCode trong reqSku
+                const foundSku = reqSku.find((r) => r.skuCode === variant.sku);
+                const quantity = foundSku ? foundSku.quantity : 0;
+    
+                // Lấy thông tin sản phẩm từ mô hình Product (sử dụng populate để lấy thông tin từ ref)
+                const product = await Product.findById(variant.productId).populate('price');
+    
+                // Tính tổng giá và thêm vào mảng sản phẩm
+                const totalPrice = product.price * quantity;
+                total += totalPrice; // Cộng vào tổng
+    
+                products.push({
+                    product: variant.productId,
+                    variant: variant._id,
+                    quantity: quantity,
+                    totalPrice: totalPrice,
+                });
+            }
+    
+            // Kiểm tra nếu một trong số reqSku không tìm thấy
+            reqSkus.forEach((sku) => {
+                if (!variants.some((variant) => variant.sku === sku)) {
+                    notFoundSkus.push(sku);
+                }
+            });
+    
+            if (notFoundSkus.length > 0) {
+                return res.status(404).json({
+                    error: `Các SKU không tồn tại: ${notFoundSkus.join(", ")}`,
+                });
+            }
+    
+            res.status(200).json({ success: "Lấy chi tiết sản phẩm thành công", data: products, total: total });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
     
 
    

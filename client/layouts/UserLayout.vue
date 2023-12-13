@@ -14,7 +14,7 @@
                                     Thong tin ca nhan
                             </ULink>
                             <ULink
-                                    to="/profile/ordersDetail"
+                                    to="/profile/orders-detail"
                                     class="p-2 bg-slate-300 rounded-3xl text-center"
                                     active-class="text-primary"
                                     inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"

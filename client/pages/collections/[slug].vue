@@ -11,7 +11,7 @@
                 <UCard v-for="item in filteredProducts" :key="item._id" class="hover:shadow-2xl">
                 <div class="py-0">
                   <div>
-                    <ULink :to="`/product/${item.productId}`">
+                    <ULink :to="`/product/${item._id}`">
                       <img class="" :src="item.images[0].src" alt="">
                     </ULink>
                   </div>
@@ -37,7 +37,7 @@
             <div v-else>
                 khong co
             </div>
-            <UPagination v-if="filteredProducts.length" class="m-10" size="sm" v-model="page" :page-count="pageCount" :total="totalPage" show-last show-first />
+            <UPagination  class="m-10" size="sm" v-model="page" :page-count="pageCount" :total="totalPage" show-last show-first />
           </div>
         </div>
       </UContainer>
@@ -77,10 +77,10 @@ const products = ref([
 
 const totalPage = ref(1)
 
-const getAllProduct = async (pa, paCo)=>{
-const res = await request.get(`product/getProductByCategory/${slug}?page=${pa}&limit=${paCo}`)
-products.value = res.data.data
-}
+  const getAllProduct = async (pa, paCo)=>{
+  const res = await request.get(`product/getProductByCategory/${slug}?page=${pa}&limit=${paCo}`)
+  products.value = res.data.data
+  }
 const getTotalPage = async() => {
 // Kiểm tra xem có bộ lọc được áp dụng hay không
 if (selected.value.price === null && selected.value.brand === null) {
@@ -108,7 +108,7 @@ const priceCondition =
     item.price <= selected.value.price.end);
 
 const brandCondition =
-  !selected.value.brand || item.brand === selected.value.brand;
+  !selected.value.brand || item.brand.name === selected.value.brand;
 
 // Trả về true nếu sản phẩm thoả mãn cả hai điều kiện
 return priceCondition && brandCondition;
@@ -119,13 +119,17 @@ const getCategory = async()=>{
     const res = await request.get(`category/get_category_by_id/${slug}`)
     categoryName.value =res.data.data.name
 }
+const getAll = async ()=>{
+  const res = await request.get('product/getAllProduct')
+  totalPage.value = res.data.data.length
+}
 
 watch(() => {
-getTotalPage()
+// getTotalPage()
 getCategory()
 getAllProduct(page.value, pageCount.value);
 });
-
+getAll()
 
 </script>
 

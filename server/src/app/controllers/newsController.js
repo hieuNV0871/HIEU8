@@ -17,12 +17,26 @@ const newsController = {
     },
     updateNews: async (req, res) => {
         try {
-            const {title, author, content, publishedAt} = req.body
-            const _id = req.params.id
-            await News.findByIdAndUpdate(_id, {title, author, content, publishedAt})
-            res.status(200).json({success: "Cập nhật bài viết thành công"})
+            const { title, author, content, publishedAt } = req.body;
+            const _id = req.params.id;
+            // Lấy thông tin người dùng từ req.user (tùy thuộc vào cách bạn xác thực)
+            // Kiểm tra xem người dùng hiện tại có phải là tác giả của news hay không
+            const newsToUpdate = await News.findById(_id);
+
+    
+            if (!newsToUpdate) {
+                return res.status(404).json({ error: "Bài viết không tồn tại" });
+            }
+
+            if (newsToUpdate.author !== author) {
+                return res.status(403).json({ error: "Bạn không có quyền chỉnh sửa bài viết này" });
+            }
+            // Nếu là tác giả, thì tiến hành cập nhật
+            await News.findByIdAndUpdate(_id, { title, content, publishedAt });
+    
+            res.status(200).json({ success: "Cập nhật bài viết thành công" });
         } catch (error) {
-            res.status(500).json({error: error.message})
+            res.status(500).json({ error: error.message });
         }
     },
     deleteOneNews: async (req, res) => {

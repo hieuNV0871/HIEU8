@@ -90,14 +90,14 @@
                       <div>
                         <div v-for="cartItem in cart.carts.cartItems" :key="cartItem._id">
                           <ULink  to="/cart">
-                              <div class="text-gray-500 hover:bg-gray-100 px-3 rounded-lg flex gap-x-2 items-center">
+                              <div class="text-gray-500 hover:bg-gray-100  rounded-lg flex gap-x-2 items-center">
                                   <img :src="cartItem.variant.productId.images[0].src" alt="" class="w-[40px] h-[40px]"/>
-                                  <div class="">
+                                  <div class="w-full">
                                       <h3 class="text-black">{{cartItem.variant.productId.name}}</h3>
-                                      <div class="flex justify-between gap-x-5">
-                                        <span>{{Number(cartItem.variant.productId.price).toLocaleString()  }} đ</span>
-                                        <span>|</span>
-                                        <span>
+                                      <div class="flex justify-between gap-x-2">
+                                        <span class="w-[45%]">{{Number(cartItem.variant.productId.price).toLocaleString()  }} đ</span>
+                                        <span >|</span>
+                                        <span class="w-[45%]">
                                            {{ cartItem.variant.sku }}
                                         </span>
                                       </div>
@@ -126,7 +126,7 @@
               </UPopover>
             </div>
 
-            <div v-if="!auth.userq.username">
+            <div v-if="!auth?.userq?.username">
 
                 <UButton
                     to="/auth/login"
