@@ -5,7 +5,7 @@ import axios from "axios";
 import request from "../utils/request";
 export const authStore = defineStore("auth", () => {
   let authUser = useLocalStorage("pinia/auth/login", {});
-  let isLogged = useLocalStorage(false)
+  let isLogged = useLocalStorage("isLogged", false)
   let token = useLocalStorage("dung_dong_vao_cai_nay","")
   let timeExpried = useLocalStorage(0)
   let errorMessage = ref("");

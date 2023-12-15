@@ -7,7 +7,13 @@ import { ref, computed } from "vue";
 export const cartStore = defineStore("cart", () => {
   
     const carts = useLocalStorage("Cart", {})
-    const itemsToCheckout = useLocalStorage('itemsToCheckout', [])
+    const itemsToCheckout = useLocalStorage("itemsToCheckout", [])
+// this one is synced
+// const itemsToCheckout = ref(useLocalStorage('itemsToCheckout', []))
+// local copy of the value, not synced to localStorage
+// const showItemsToCheckout = ref(toRaw(itemsToCheckout))
+
+
     let errorMessage = ref("");
 
     const setItemToCheckout = (item)=>{
@@ -45,6 +51,15 @@ export const cartStore = defineStore("cart", () => {
     removeCartItem,
     setItemToCheckout,
     itemsToCheckout,
+    // showItemsToCheckout,
     errorMessage
-  };
+  }
+},
+{
+  persist: {
+    
+    storage: persistedState.localStorage,
+
+    properties: ["itemsToCheckout"],
+  },
 });

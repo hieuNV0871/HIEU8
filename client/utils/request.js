@@ -34,6 +34,7 @@ request.interceptors.response.use(
         token.value = res.data.accessToken
         return request(originalRequest);
       } catch (error) {
+        navigateTo('/auth/login')
       }
     }
     return Promise.reject(error);

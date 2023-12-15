@@ -17,13 +17,13 @@ const handle = ($event, a) => {
 function convertToAbbreviation(inputString) {
     const words = inputString.split(' ');
 
-    // Lặp qua mỗi từ và thực hiện điều chỉnh
+    
     const abbreviation = words.map((word, index) => {
         if (index === words.length - 1) {
-            // Nếu là từ cuối cùng, giữ nguyên chữ cuối cùng
+
             return word;
         } else {
-            // Ngược lại, lấy kí tự đầu tiên
+           
             return word.charAt(0);
         }
     }).join('');
@@ -34,7 +34,7 @@ function convertToAbbreviation(inputString) {
 const input = "san pham so mot";
 const output = input.split(' ').map((word, index, array) => index === array.length - 1 ? word : word.charAt(0)).join('');
 
-console.log(output); // Kết quả: spsmt
+console.log(output); 
 </script>
 
 <style>

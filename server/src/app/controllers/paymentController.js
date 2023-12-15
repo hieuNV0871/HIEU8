@@ -1,5 +1,6 @@
 
 const Orders  = require("../models/Orders")
+const {VariantProduct} = require("../models/Product")
 const crypto = require('crypto');
 const https = require('https');
 const axios = require('axios').default // npm install axios
@@ -241,6 +242,13 @@ const paymentController = {
                         //that bai
                         //paymentStatus = '2'
                         orderPending.status = -1
+                        for (const item of orderPending.ordersItems) {
+                            const variant = await VariantProduct.findById(item.variant);
+                            if (variant) {
+                              variant.quantity += item.quantity;
+                              await variant.save();
+                            }
+                          }
                         await orderPending.save()
                         // Ở đây cập nhật trạng thái giao dịch thanh toán thất bại vào CSDL của bạn
                         res.status(200).json({RspCode: '00', Message: 'Success'})

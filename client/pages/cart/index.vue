@@ -1,7 +1,7 @@
 <template>
       <MainLayout>
           <UContainer>
-            {{ itemsToCheckout }}
+            <!-- {{ itemsToCheckout }} -->
             <div class="flex justify-between gap-x-5 my-20 p-10" v-if="cart.carts.cartItems.length">
                 <div class="w-1/4 h-full flex flex-col gap-y-3 px-5 py-2 bg-white shadow-2xl rounded">
                   <span
@@ -119,7 +119,16 @@ return {
 const toast = useToast()
 const itemsSelected = ref([]);
 const selectedAll = ref(true);
+
 const itemsToCheckout = ref(cart.carts.cartItems)
+
+const handlePassData = () =>{
+  // cart.setItemToCheckout(itemsToCheckout.value)
+  // console.log(itemsToCheckout);
+  cart.itemsToCheckout = itemsToCheckout.value
+  // localStorage.setItem("123", itemsToCheckout.value)
+  navigateTo('/checkout')
+}
 
 const handleChangeSelectedQuantity =  async(id, type) => {
     const cartItem  = cart.carts.cartItems.find(item=>item._id === id)
@@ -235,11 +244,7 @@ const overallTotalPrice = computed(() => {
   }, 0);
 });
 
-const handlePassData = () =>{
-  cart.setItemToCheckout(itemsToCheckout.value)
-  // cart.itemsToCheckout = itemsToCheckout.value
-  navigateTo('/checkout')
-}
+
 
 </script>
 

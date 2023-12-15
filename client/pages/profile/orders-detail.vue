@@ -13,7 +13,7 @@
                   </div>
                 </div>
                 <div class="w-2/5">
-                  <h3>Hình thức thanh toán: {{ orders.paymentMethod === "COD" ? "Thanh toán khi nhận hàng" : "Đã chuyển khoản" }}</h3>
+                  <h3>Hình thức thanh toán: {{ orders.paymentMethod === "COD" ? "Thanh toán khi nhận hàng" : "Chuyển khoản" }}</h3>
                   <h3>Trạng thái: <span class="font-semibold">{{ orders.status == 0
                     ? "Đã đặt hàng, đang chờ vận chuyển"
                     : orders.status == 1
