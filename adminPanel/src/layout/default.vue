@@ -6,6 +6,7 @@
         <a-menu-item :key="item.path" v-for="item in menu">
           <span>{{ item.name }}</span>
         </a-menu-item>
+        
         <a-menu-item>
           <span @click="handleLogout">Dang xuat</span>
         </a-menu-item>
@@ -15,10 +16,32 @@
       <a-layout-header style="background: #fff; padding: 0">
         <div class="flex items-center justify-end px-8 relative">
           <h3 class="absolute left-[50%] translate-x-[-50%] font-bold">
-            ADMIN 
+            ADMIN
           </h3>
-          <div class="flex items-center space-x-2 cursor-pointer">
-            <a-avatar >{{ auth.authUser.avatar ? auth.authUser.avatar.src : "" }}</a-avatar> <span>{{auth.authUser.avatar ? auth.authUser.username : "username"}}</span>
+          <div class="mr-20 cursor-pointer">
+            <a-popover v-model:open="visible" title="Thông báo mới" trigger="click">
+              <template #content>
+                <div>
+                  <div v-for="item in notifications" :key="item._id" class="flex justify-between items-center gap-x-5">
+                    <div>
+                      <h3 class="font-semibold text-sm">{{ item.title }}</h3>
+                      <h4 :title="item.content" class="font-light text-[12px] truncate overflow-ellipsis w-56">{{ item.content }}</h4>
+                    </div>
+                    <div>
+                      <h5 @click="handleCheckNoti(item._id)">kiem tra ngay</h5>
+                      <h5 ref="refIsRead" @click="handleReadNoti(item._id)">Đánh dấu đã đọc</h5>
+                    </div>
+                  </div>
+                </div>
+                <a @click="hide">Close</a>
+              </template>
+              <a-badge :count="notifications?.length || '0'">
+                <a-avatar shape="square" size="small" />
+              </a-badge>
+            </a-popover>
+          </div>
+            <div class="flex items-center space-x-2 cursor-pointer">
+              <a-avatar >{{ auth.authUser.avatar ? auth.authUser.avatar.src : "" }}</a-avatar> <span>{{auth.authUser.avatar ? auth.authUser.username : "username"}}</span>
           </div>
         </div>
       </a-layout-header>
@@ -35,10 +58,46 @@
 import { ref, watch, watchEffect , onMounted} from "vue";
 import { useRouter } from "vue-router";
 import {authStore} from '../stores/auth'
+const auth = authStore()
+import {getAllNotifications, readNotification} from '../request/notification'
+const notifications = ref()
+const refIsRead = ref(null)
+const router = useRouter();
+
+import { io } from "socket.io-client";
+const socket = io("http://localhost:5000");
+const userId = auth.authUser._id
+socket.on("connect", () => {
+  console.log(socket.id); 
+  socket.emit("userId", userId);
+});
+
+socket.on("sendNotiToAdmin", (msg) => { 
+  if(msg==="new-order"){
+    alert("co don hang moi")
+    getAllNoti()
+  }
+ });
+const handleReadNoti = async id => {
+  await readNotification(id)
+  getAllNoti()
+}
+
+const handleCheckNoti = async id => {
+  await readNotification(id)
+  router.push("/order")
+  getAllNoti()
+  visible.value = false
+}
+const getAllNoti = async ()=>{
+  const {data} = await getAllNotifications({
+      limit: 5,
+      isRead: "false"
+  })
+  notifications.value = data.data
+}
 const selectedKeys = ref([]);
 const collapsed = ref(false);
-const router = useRouter();
-const auth = authStore()
 const menu = ref([])
 
 const setMenu = ()=>{
@@ -128,6 +187,13 @@ const handleLogout = async()=>{
     router.push("/login")
   }
 }
+
+
+const visible = ref(false);
+
+const hide = () => {
+  visible.value = false;
+};
 watchEffect(() => {
   setKeyManu();
 });
@@ -140,6 +206,7 @@ watch(
 );
 onMounted(() => {
   setMenu()
+  getAllNoti()
 })
 </script>
 <style>

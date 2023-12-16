@@ -12,6 +12,8 @@ const ordersRouter = require('./orders')
 const cartRouter = require('./cart')
 const paymentRouter = require('./payment')
 const statisticsRouter = require('./statistics')
+const notificationRouter = require('./notification')
+
 function route(app) {
     app.use('/v1/auth', authRouter)
     app.use('/v1/upload', uploadRouter)
@@ -25,6 +27,8 @@ function route(app) {
     app.use('/v1/cart', cartRouter)
     app.use('/v1/payment', paymentRouter)
     app.use('/v1/statistics', statisticsRouter)
+    app.use('/v1/notification', notificationRouter)
+
 
     app.use((req, res, next) => {
         res.status(404).json({error: 'Not found!'})

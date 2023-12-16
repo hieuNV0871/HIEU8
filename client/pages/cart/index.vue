@@ -123,11 +123,17 @@ const selectedAll = ref(true);
 const itemsToCheckout = ref(cart.carts.cartItems)
 
 const handlePassData = () =>{
+  if(itemsToCheckout.value.length <= 0){
+    toast.add({ title: "Vui lòng chọn sản phẩm", color: 'red', timeout: 1000 })
+    // return
+  }else{
+    cart.itemsToCheckout = itemsToCheckout.value
+    // localStorage.setItem("123", itemsToCheckout.value)
+    navigateTo('/checkout')
+
+  }
   // cart.setItemToCheckout(itemsToCheckout.value)
   // console.log(itemsToCheckout);
-  cart.itemsToCheckout = itemsToCheckout.value
-  // localStorage.setItem("123", itemsToCheckout.value)
-  navigateTo('/checkout')
 }
 
 const handleChangeSelectedQuantity =  async(id, type) => {

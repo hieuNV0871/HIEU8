@@ -1,7 +1,7 @@
 const Orders = require("../models/Orders");
 const Cart = require("../models/Cart");
 const User = require("../models/User");
-
+const {createNotification} = require("./notificationController")
 
 const { VariantProduct } = require("../models/Product");
 const ordersController = {
@@ -69,7 +69,7 @@ const ordersController = {
           {
             $pull: {
               cartItems: {
-                product: { $in: ordersItems.map((item) => item.product) },
+                variant: { $in: ordersItems.map((item) => item.variant) },
               },
             },
           }
@@ -82,6 +82,7 @@ const ordersController = {
           variant.quantity -= item.quantity;
           await variant.save();
         }
+
         else {
           return res
             .status(400)
@@ -89,7 +90,15 @@ const ordersController = {
         }
       }
       await newOrders.save();
-
+      const notification = {
+        userId: user,
+        type: "Order",
+        title: getRandomTitle(),
+        content: "Có một đơn hàng mới được tạo, vui lòng kiểm tra"
+      }
+      console.log(notification.title);
+     await createNotification(notification.userId, notification.type, notification.title, notification.content)
+      _io.emit('sendNotiToAdmin',  "new-order")
       res
         .status(200)
         .json({ success: "Tạo đơn hàng thành công", data: newOrders });
@@ -252,6 +261,14 @@ const ordersController = {
       res.status(500).json({ error: error.message });
     }
   },
+};
+const getRandomTitle = () => {
+  // Ngẫu nhiên chọn giữa hai câu
+  const title = Math.random() < 0.5
+    ? "Có khách đặt hàng, xem ngay"
+    : "Đơn hàng mới đã được tạo, hãy kiểm tra ngay";
+
+  return title;
 };
 
 module.exports = ordersController;

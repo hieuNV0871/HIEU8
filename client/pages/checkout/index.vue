@@ -127,6 +127,15 @@ const handleCreateOrders = async(value)=>{
     }
     console.log(order);
     const res = await request.post("orders/create", order)
+        await cart.getCarts()
+    if(res.data.success){
+        toast.add({ title: 'Đặt hàng thành công, bạn sẽ chuyển đến chi tiết đơn hàng', timeout: 1000 })
+        if(paymentMethod.value === "COD"){
+          navigateTo("/profile/orders-detail")
+        }
+    }else{
+        toast.add({ title: res.data.error, color: 'red', timeout: 1000 })
+    }
     const orderId = res.data.data._id
     if(paymentMethod.value === 'MOMO'){
       const reqData = {

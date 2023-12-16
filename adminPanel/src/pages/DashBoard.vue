@@ -11,6 +11,4 @@ import { authStore } from "../stores/auth";
 
 const auth = authStore()
 
-
-
 </script>
