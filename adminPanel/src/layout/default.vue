@@ -36,7 +36,7 @@
                 <a @click="hide">Close</a>
               </template>
               <a-badge :count="notifications?.length || '0'">
-                <a-avatar shape="square" size="small" />
+                <BellOutlined :style="{fontSize: '24px'}"/>
               </a-badge>
             </a-popover>
           </div>
@@ -60,6 +60,7 @@ import { useRouter } from "vue-router";
 import {authStore} from '../stores/auth'
 const auth = authStore()
 import {getAllNotifications, readNotification} from '../request/notification'
+import { BellOutlined } from "@ant-design/icons-vue";
 const notifications = ref()
 const refIsRead = ref(null)
 const router = useRouter();
@@ -139,10 +140,6 @@ const setMenu = ()=>{
     menu.value = menutmp
   }else if(auth.authUser.role===1){
     menu.value = [
-  {
-    path: "/dashboard",
-    name: "Dashboard",
-  },
 
   {
     path: "/category",

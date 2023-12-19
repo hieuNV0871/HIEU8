@@ -124,8 +124,17 @@
                             Tại đây
                         </UButton>
                     </div>
+                    <div>
+                        <h3>
+                            Chi tiết sản phẩm:
+                        </h3>
+                        <div v-html="product.description">
+                            
+                        </div>
+                    </div>
                 </div>
                 <!-- end detail -->
+                
             </div>
             <div>
                 

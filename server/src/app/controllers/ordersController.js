@@ -263,8 +263,8 @@ const ordersController = {
   },
 };
 const getRandomTitle = () => {
-  // Ngẫu nhiên chọn giữa hai câu
-  const title = Math.random() < 0.5
+  
+  const title = Math.floor(Math.random() * 10) + 1 < 5
     ? "Có khách đặt hàng, xem ngay"
     : "Đơn hàng mới đã được tạo, hãy kiểm tra ngay";
 

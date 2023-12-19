@@ -3,13 +3,15 @@ const Orders = require('../models/Orders')
 
 const statisticsController = {
   revenueStatistics: async (req, res) => {
-    const { type, dateFrom, dateTo } = req.body;
-
+    const { type, dateFrom, dateTo } = req.query;
+    console.log(req.query);
     const defaultDateFrom = new Date();
     defaultDateFrom.setMonth(defaultDateFrom.getMonth() - 1); 
-
     const startDate = dateFrom ? new Date(dateFrom) : defaultDateFrom;
     const endDate = dateTo ? new Date(dateTo) : new Date();
+  //  const df = moment(startDate).format('YYYY-MM-DD');
+  //   const t = moment(endDate).format('YYYY-MM-DD');
+
     let step = -1;
     if (type == "day") {
         step = 10;
@@ -22,47 +24,86 @@ const statisticsController = {
         return res.status(400).json({ error: "Type param is invalid" })
     }
     try {
-        const revenue = await Orders.aggregate(
-            [
-                {
-                    "$match": {
-                        "createdAt": { "$gte": startDate, "$lte": endDate },
-                        "status": { "$ne": -1 } //not equal
-                    }
+        const revenue = await Orders.aggregate([
+            {
+              "$match": {
+                "createdAt": { "$gte": startDate, "$lte": endDate },
+              }
+            },
+            {
+              "$unwind": "$ordersItems"
+            },
+            {
+              "$lookup": {
+                "from": "products",
+                "localField": "ordersItems.product",
+                "foreignField": "_id",
+                "as": "productDetails"
+              }
+            },
+            {
+              "$unwind": "$productDetails"
+            },
+            {
+              "$group": {
+                "_id": {
+                  $substr: ['$createdAt', 0, step]
                 },
-                {
-                    "$unwind": "$ordersItems"
+                "totalAmount": { "$sum": { "$multiply": ["$ordersItems.quantity", "$productDetails.price"] } },
+                "totalQuantityProduct": { "$sum": "$ordersItems.quantity" },
+                "cancelledOrders": {
+                  "$sum": {
+                    "$cond": { "if": { "$eq": ["$status", -1] }, "then": 1, "else": 0 }
+                  }
                 },
-                {
-                    "$lookup": {
-                        "from": "products", 
-                        "localField": "ordersItems.product",
-                        "foreignField": "_id",
-                        "as": "productDetails"
-                    }
+                "successfulOrders": {
+                  "$sum": {
+                    "$cond": { "if": { "$in": ["$status", [0, 1, 2, 3]] }, "then": 1, "else": 0 }
+                  }
                 },
-                {
-                    "$unwind": "$productDetails"
+                "totalCancelledAmount": {
+                  "$sum": {
+                    "$cond": { "if": { "$eq": ["$status", -1] }, "then": { "$multiply": ["$ordersItems.quantity", "$productDetails.price"] }, "else": 0 }
+                  }
                 },
-                {
-                    "$group": {
-                        "_id": {
-                            $substr: ['$createdAt', 0, step]
-                        }, //nhóm tất cả các đơn hàng lại với nhau. không quan tâm đến đơn hàng thuộc về người dùng nào hoặc thuộc về loại sản phẩm nào
-                        "totalAmount": { "$sum": { "$multiply": ["$ordersItems.quantity", "$productDetails.price"] } },
-                        "totalQuantity": { "$sum": "$ordersItems.quantity" }
-                    }
+                "totalSuccessfulAmount": {
+                  "$sum": {
+                    "$cond": { "if": { "$in": ["$status", [0, 1, 2, 3]] }, "then": { "$multiply": ["$ordersItems.quantity", "$productDetails.price"] }, "else": 0 }
+                  }
                 },
-                {
-                    "$project": {
-                        "_id": 0, // bỏ trường id
-                        "date": "$_id",
-                        "totalAmount": "$totalAmount",
-                        "totalQuantity": "$totalQuantity"
-                    }
-                }
-            ]
-        )
+                // "top5bestselling": {
+                //     "$push": {
+                //       "orderItem": "$ordersItems",
+                //       "product": "$productDetails",
+                //       "$sort": { "totalQuantity": -1 }, 
+                //       "$limit": 5 
+                //     },
+                //   }
+              }
+            },
+            {
+              "$project": {
+                "_id": 0,
+                "date": "$_id",
+                "totalAmount": "$totalAmount",
+                "totalQuantityProduct": "$totalQuantityProduct",
+                "cancelledOrders": "$cancelledOrders",
+                "successfulOrders": "$successfulOrders",
+                "totalCancelledAmount": "$totalCancelledAmount",
+                "totalSuccessfulAmount": "$totalSuccessfulAmount",
+                // "top5bestselling": 1
+              }
+            },
+            // {
+            //   $sort: {
+            //       totalAmount: -1 
+            //   }
+            // },
+            // {
+            //   $limit: 5 
+            // }
+          ]);
+        
         if (revenue) {
             return res.status(200).json({ revenue })
         }
@@ -73,7 +114,38 @@ const statisticsController = {
   },
   hotSellingProductStatistics: async (req, res) => {
     try {
-        
+        const hotSellingProduct = await Orders.aggregate([
+            {
+                $unwind: "$ordersItems" 
+            },
+            {
+                $lookup: {
+                  from: "products",
+                  localField: "ordersItems.product",
+                  foreignField: "_id",
+                  as: "productDetails"
+                }
+              },
+            {
+                $group: {
+                    _id: "$ordersItems.product", 
+                    totalQuantity: { $sum: "$ordersItems.quantity" }, 
+                    detail: { $first: "$productDetails" }
+                }
+            },
+            {
+                $sort: {
+                    totalQuantity: -1 
+                }
+            },
+            {
+                $limit: 5 
+            }
+        ])
+        if (hotSellingProduct) {
+            return res.status(200).json({ hotSellingProduct })
+        }
+        res.status(400).json({ error: "Something went wrong" })
     } catch (error) {
         
     }

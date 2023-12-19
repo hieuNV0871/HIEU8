@@ -182,17 +182,17 @@
       router.push('/order')
     }
     } catch (error) {
-        // Xử lý thông báo lỗi từ server
+        
         if (error.response) {
-            // Lỗi từ phía server với mã trạng thái không phải 2xx
+        
             console.error("Server error:", error.response.data);
             errMes.value = error.response.data
             skuCodes.value = []
         } else if (error.request) {
-            // Lỗi không có phản hồi từ server
+            
             console.error("No response from server:", error.request);
         } else {
-            // Lỗi khác
+           
             console.error("Error:", error.message);
         }
     }

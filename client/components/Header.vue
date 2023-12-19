@@ -70,7 +70,7 @@
                         <div>
                         </div>
                         <div>
-                          <UButton to="/collections" color="black" variant="link">
+                          <UButton to="/collections/all" color="black" variant="link">
                             Mua sắm ngay
                           </UButton>
                         </div>
@@ -116,7 +116,7 @@
                         <div>
                         </div>
                         <div>
-                          <UButton to="/collections" color="black" variant="link">
+                          <UButton to="/collections/all" color="black" variant="link">
                             Mua sắm ngay
                           </UButton>
                         </div>
@@ -175,7 +175,7 @@ const cart = cartStore()
 
 const navLinks = ref([
   { name: 'Trang chủ', path: '/' },
-  { name: 'Sản phẩm', path: '/collections' },
+  { name: 'Sản phẩm', path: '/collections/all' },
   { name: 'Phụ kiện', path: '/ok1' },
   { name: 'Tin tức', path: '/ok2' },
 

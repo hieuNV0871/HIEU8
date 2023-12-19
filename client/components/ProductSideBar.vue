@@ -71,8 +71,6 @@ const selected = ref({
 })
 
 const applyFilters = () => {
-  // Emit a custom event to notify the parent component
-  // Pass the selected filters as payload
   emit('apply-filters', selected);
 };
 const clearFilters = () => {
@@ -118,7 +116,10 @@ const getAllBrand = async()=>{
 // const resetFilters = () => {
 //   selected.value = { price: null, brand: null };
 // };
-getAllBrand()
-getParentCategory();
+onMounted(() => {
+  getAllBrand()
+  getParentCategory();
+
+})
 </script>
 

@@ -103,7 +103,7 @@ const productController = {
                     variantProducts.push(variantProduct);
                     existingVariants.add(variantKey);
                 } else {
-                    console.log(`Biến thể đã tồn tại cho size ${size.name} và color ${color.name}`);
+                    await VariantProduct.findOneAndUpdate({ productId: productId, sizeId: variant.sizeId, colorId: variant.colorId }, { $set: { quantity: variant.quantity } });
                 }
             }
     

@@ -15,7 +15,7 @@
                   >
                   <div class="flex flex-col gap-y-2 items-center">
                     <UButton variant="outline" @click="handlePassData">Đặt hàng ngay</UButton>
-                    <UButton variant="outline" to="/collections">Mua thêm sản phẩm</UButton>
+                    <UButton variant="outline" to="/collections/all">Mua thêm sản phẩm</UButton>
                   </div>
                 </div>
               <div class="w-3/4">
@@ -87,7 +87,7 @@
             <div v-else>
                 Chưa có sản phẩm trong giỏ hàng
                 <ULink
-                  to="/collections"
+                  to="/collections/all"
                   active-class="text-primary"
                   inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 >
