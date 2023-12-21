@@ -94,11 +94,11 @@ const statisticsController = {
                 // "top5bestselling": 1
               }
             },
-            // {
-            //   $sort: {
-            //       totalAmount: -1 
-            //   }
-            // },
+            {
+              $sort: {
+                "date": 1 
+              }
+            },
             // {
             //   $limit: 5 
             // }

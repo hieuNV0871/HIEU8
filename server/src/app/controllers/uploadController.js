@@ -6,6 +6,7 @@ const uploadController = {
     try {
       const images = [];
       const files = req.files;
+      // console.log(files);
       if(!files) return
       const folderName = req.body.folderName
       for (const file of files) {

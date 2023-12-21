@@ -1,7 +1,4 @@
 const mongoose = require("mongoose")
-const slug = require('mongoose-slug-generator');
-
-mongoose.plugin(slug);
 
 const productSchema = new mongoose.Schema({
     name: {

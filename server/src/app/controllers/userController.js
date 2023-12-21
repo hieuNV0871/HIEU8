@@ -58,6 +58,7 @@ const userController = {
   updateUser: async (req, res) => {
     try {
       const { username, avatar } = req.body;
+      console.log(req.user);
       await Users.findOneAndUpdate({ _id: req.user.id }, { username, avatar });
       res
         .status(200)

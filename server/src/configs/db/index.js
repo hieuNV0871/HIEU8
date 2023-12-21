@@ -11,8 +11,8 @@ async function connect() {
         // await ColorProduct.create({ name: 'do' });
         // await ColorProduct.create({ name: 'tim' });
         // await ColorProduct.create({ name: 'vang' });
-        // await SizeProduct.create({ name: '29' });
-        // await SizeProduct.create({ name: '30' });
+        // await SizeProduct.create({ name: 'S' });
+        // await SizeProduct.create({ name: 'L' });
         // await SizeProduct.create({ name: 'M' });
         // await SizeProduct.create({ name: 'XL' });
 

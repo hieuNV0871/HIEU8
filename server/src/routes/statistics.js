@@ -8,7 +8,7 @@ const authAdmin = require("../app/middleware/authAdmin")
 
 
 
-router.get("/revenue", auth, statisticsController.revenueStatistics)
+router.get("/revenue", auth, authAdmin, statisticsController.revenueStatistics)
 router.get("/hotSellingProduct", auth, authAdmin, statisticsController.hotSellingProductStatistics)
 
 

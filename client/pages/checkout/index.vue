@@ -47,7 +47,7 @@
                         <UFormGroup v-if="paymentMethod === 'MOMO'" label="Chọn ngân hàng" name="bankCode">
                           <USelect v-model="bankCode" :options="bankCodes" option-attribute="name"/>
                         </UFormGroup>
-                        
+                        <span>9704198526191432198</span>
                         <UButton type="submit">
                             Đặt hàng
                         </UButton>
@@ -115,6 +115,10 @@ const itemsToCheckout = ref([]);
 
 
 const handleCreateOrders = async(value)=>{
+  if(!state.value.name || !state.value.address || !state.value.phoneNumber){
+    toast.add({ title: "dien thong tin di", color: 'red', timeout: 1000 })
+    return
+  }
     const order = {
         name: value.data.name,
         user: cart.carts.user,

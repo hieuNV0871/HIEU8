@@ -45,6 +45,7 @@ io.on('connection', (socket) => {
   const socketID = socket.id;
   console.log('New connection. Socket ID:', socketID);
   socket.on("userId", async (userId) => {
+    if(!userId) return
     const userSocketId = await UserSocketId.findOne({ userId });
     if (userSocketId) {
       userSocketId.socketId.push(socketID);

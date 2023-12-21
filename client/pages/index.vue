@@ -139,16 +139,16 @@ useHead(() => {
 
 const slideItems = ref([
   {
-    src: "https://wallpapercave.com/wp/wp4906006.jpg",
+    src: "https://res.cloudinary.com/ddjil4odw/image/upload/v1703058868/shorts_e3313b51be654e06a5047049830cb9a4_rh0xvr.webp",
     alt: "slide",
     to:"#"
   },
   {
-    src: "https://wallpapercave.com/wp/wp2665219.jpg",
+    src: "https://res.cloudinary.com/ddjil4odw/image/upload/v1703058945/2_5f0595d93fd84fe7a4fef1e775d1a3a8_vhovwa.webp",
     alt: "slide",
     to:"#"
   },  {
-    src: "https://jooinn.com/images/beauty-of-nature-24.jpg",
+    src: "https://res.cloudinary.com/ddjil4odw/image/upload/v1703058949/4_f16c2272b69c43a78f1f176ac1fa2105_is6wxb.webp",
     alt: "slide",
     to:"#"
   },

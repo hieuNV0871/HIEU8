@@ -8,7 +8,7 @@ router.get("/info", auth, userController.getUserInfo)
 router.get("/all_user",auth, authAdmin, userController.getAllUser)
 
 router.post("/create",auth, authAdmin, userController.createUser)
-router.patch("/update", userController.updateUser)
+router.patch("/update",auth, userController.updateUser)
 router.patch("/update_permission/:id",auth, authAdmin, userController.updateUserPermission)
 
 

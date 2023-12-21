@@ -242,13 +242,15 @@ const filterOption = (input, option) => {
   return option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 };
 const upload = async (e) => {
+  console.log(1);
   loading.value = true;
   const formData = new FormData();
   const files = e.target.files;
+  console.log(files);
   for (let i = 0; i < files.length; i++) {
     formData.append("images", files[i]);
   }
-  formData.append("folderName", "banners");
+  formData.append("folderName", "products");
   try {
     const { data } = await uploadImages(formData);
     formState.value = {

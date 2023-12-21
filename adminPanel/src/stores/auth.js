@@ -3,10 +3,10 @@ import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import axios from "axios";
 import request from '../request/index';
-export const authStore = defineStore("auth", () => {
-  let authUser = useLocalStorage("pinia/auth/login", {});
+export const authStore = defineStore("authadmin", () => {
+  let authUser = useLocalStorage("pinia/auth/login_admin", {});
   let isLogged = useLocalStorage(false)
-  let token = useLocalStorage("dung_dong_vao_cai_nay","")
+  let token = useLocalStorage("dung_dong_vao_cai_nay_admin","")
   let timeExpried = useLocalStorage(0)
   let errorMessage = ref("");
   const userq = computed(() => authUser.value);

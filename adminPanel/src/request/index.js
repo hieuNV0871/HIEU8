@@ -10,7 +10,7 @@ const request = axios.create({
 });
 
 request.interceptors.request.use((config) => {
-  const token = localStorage.getItem('dung_dong_vao_cai_nay')
+  const token = localStorage.getItem('dung_dong_vao_cai_nay_admin')
   if (token) {
     config.headers.Authorization = token;
   }
@@ -30,7 +30,7 @@ request.interceptors.response.use(
           withCredentials: true,
           
         })
-        let token = useLocalStorage("dung_dong_vao_cai_nay","")
+        let token = useLocalStorage("dung_dong_vao_cai_nay_admin","")
         token.value = res.data.accessToken
         return request(originalRequest);
       } catch (error) {

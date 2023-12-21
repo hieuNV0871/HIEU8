@@ -179,7 +179,7 @@ const { responsive } = toRefs(options);
 const DynamicChart = computed(() => {
   return h(chartType.value === 'Line' ? Line : Bar, {
     data: { labels: data.value.labels, datasets: data.value.datasets },
-    // options: options.value.responsive,
+    options: options.value.responsive,
     style: chartStyles.value,
   });
 }, { labels, datasets, responsive });

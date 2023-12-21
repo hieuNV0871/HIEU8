@@ -8,6 +8,6 @@ const require = createRequire( import.meta.url );
 export default defineConfig({
   plugins: [vue()],
   server: {
-    port: 3000,
+    port: 3001,
   },
 })

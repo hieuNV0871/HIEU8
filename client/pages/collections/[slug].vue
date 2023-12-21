@@ -10,7 +10,7 @@
                     <UCard v-for="item in filteredProducts" :key="item._id" class="hover:shadow-2xl">
                     <div class="py-0">
                       <div>
-                        <ULink :to="`/product/${item.productId}`">
+                        <ULink :to="`/product/${item.productId || item._id}`">
                           <img class="" :src="item.images[0].src" alt="">
                         </ULink>
                       </div>

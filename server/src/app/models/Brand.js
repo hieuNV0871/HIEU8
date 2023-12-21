@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
-const slug = require('mongoose-slug-generator');
+// const slug = require('mongoose-slug-generator');
 
-mongoose.plugin(slug);
+// mongoose.plugin(slug);
 
 const brandSchema = new mongoose.Schema({
     name: {
@@ -9,11 +9,11 @@ const brandSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    slug: {
-        type: String,
-        slug: 'name',
-        unique: true
-    },
+    // slug: {
+    //     type: String,
+    //     slug: 'name',
+    //     unique: true
+    // },
     position: {
         type: Number,
         default: 0

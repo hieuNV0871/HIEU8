@@ -99,8 +99,9 @@ const auth= authStore()
     const onChangePassword = async (value) => {
       await auth.changePass(value.data)
   if (!auth.errorMessage) {
-    toast.add({ title: 'Đổi mật khẩu thành công', timeout: 1000 })
-
+    toast.add({ title: 'Đổi mật khẩu thành công, bạn sẽ được chuyển đến trang đăng nhập', timeout: 1000 })
+    await auth.logout()
+    navigateTo("/auth/login")
   } else {
     toast.add({ title: auth.errorMessage, timeout: 3000, color: "red"})
     return 0
@@ -131,6 +132,10 @@ const auth= authStore()
             console.log(value);
             await request.patch("user/update", value)
             await auth.getUserInfo()
+            if(!auth.errorMessage){
+    toast.add({ title: 'Cập nhật thông tin thành công', timeout: 1000 })
+
+            }
         }
     }
     onMounted(() => {
