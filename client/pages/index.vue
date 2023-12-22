@@ -66,8 +66,8 @@
                 <template #footer>
                   <div class="flex gap-x-3 justify-center">
                     <UButton class="w-[100px] flex justify-center" truncate color="black" variant="solid" label="Mua ngay"></UButton>
-                    <UTooltip text="Thêm vào giỏ hàng" :popper="{ arrow: true }">
-                      <UButton class="w-[100px]" truncate color="black" variant="solid" label="Thêm vào giỏ hàng"></UButton>
+                    <UTooltip to="/" text="Thêm vào giỏ hàng" :popper="{ arrow: true }">
+                      <UButton to="/" class="w-[100px]" truncate color="black" variant="solid" label="Thêm vào giỏ hàng"></UButton>
                     </UTooltip>
                   </div>
                 </template>
@@ -78,7 +78,7 @@
         </template>
       </UTabs>
       <div class="flex justify-center items-center my-14">
-        <UButton label="Xem tất cả" color="gray" to="/collections">
+        <UButton label="Xem tất cả" color="gray" to="/collections/all">
           <template #trailing>
             <UIcon name="i-heroicons-arrow-right-20-solid" />
           </template>
