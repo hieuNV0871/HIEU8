@@ -248,7 +248,7 @@ onUnmounted(() => {
   padding-bottom: 1rem;
   background-color: #000; /* Mã màu tương ứng với dark-bg trong hệ thống màu của bạn */
   position: fixed;
-  z-index: 9999;
+  z-index: 9;
   top: 0;
   left: 0;
   right: 0;

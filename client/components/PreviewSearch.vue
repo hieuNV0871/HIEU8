@@ -14,7 +14,7 @@
                 <div v-for="searchResult in searchResults.slice(0, 5)" :key="searchResult">
                     <ULink  :to="`/product/${searchResult._id}`">
                         <div class="text-gray-500 hover:bg-gray-100 px-3 rounded-lg flex gap-x-2 items-center">
-                            <img src="https://th.bing.com/th/id/OIP.r8IqnZvajmcmfws6fDgfvwHaEo?rs=1&pid=ImgDetMain" alt="" class="w-[40px] h-[40px]"/>
+                            <img :src="searchResult.images[0].src" class="w-8 h-8"/>
                             <div class="">
                                 <h3 class="text-black">{{searchResult.name}}</h3>
                                 <span>{{Number(searchResult.price).toLocaleString()  }} đ</span>

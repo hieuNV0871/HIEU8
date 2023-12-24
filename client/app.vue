@@ -14,9 +14,11 @@
   const auth = authStore()
   const cart = cartStore()
 
+  // auth.getUserInfo()
+
   const initData = async ()=> {
     await auth.getUserInfo()
-    await cart.getCarts()
+    // await cart.getCarts()
   }
   initData()
 </script>

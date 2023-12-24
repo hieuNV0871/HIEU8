@@ -61,14 +61,14 @@
 <script setup>
 import MainLayout from '../layouts/MainLayout.vue';
 import  request  from '../../utils/request';
-// definePageMeta({
-// middleware: [
-// function (to, from) {
-//   // Custom inline middleware
-// },
-// 'auth',
-// ],
-// });
+definePageMeta({
+middleware: [
+function (to, from) {
+  // Custom inline middleware
+},
+'auth',
+],
+});
 
 useHead(() => {
 return {
