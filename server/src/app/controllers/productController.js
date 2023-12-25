@@ -1,5 +1,7 @@
 const {Product, VariantProduct, SizeProduct, ColorProduct} = require('../models/Product')
 const Category = require('../models/Category')
+const Brand = require('../models/Brand')
+
 const unorm = require('unorm');
 
 const jsonStringifySafe = require('json-stringify-safe');
@@ -163,26 +165,63 @@ const productController = {
     // get
     getAllProduct: async (req, res) => {
         try {
-          const limit = parseInt(req.query.limit) || 10;
-          const page = parseInt(req.query.page) || 1;
-          const skip = (page - 1) * limit;
+            const limit = parseInt(req.query.limit) || 10;
+            const page = parseInt(req.query.page) || 1;
+            const skip = (page - 1) * limit;
           const keyword = req.query.keyword || '';
-          
-          const normalizedKeyword = unorm.nfc(keyword);
+          const startPrice = parseInt(req.query.start)
+            const endPrice = parseInt(req.query.end) 
+            const brandName = req.query.brandName 
+            const category = req.query.category || ''
+            const normalizedKeyword = unorm.nfc(keyword);
 
-          // Tính total dựa trên sự có hoặc không có từ khóa tìm kiếm
-          const total = keyword
-              ? await Product.countDocuments({ name: { $regex: new RegExp(normalizedKeyword, 'i') } })
-              : await Product.countDocuments();
+    // Build the query object for price filtering
+    let brandFilter = {};
+    if (brandName) {
+      const brand = await Brand.findOne({ name: { $regex: new RegExp(brandName, 'i') } });
+      if (brand) {
+        brandFilter = { brand: brand._id };
+      }
+    }
+
+    let filters = {}
+    // Build the query object for price and brand filtering
+    if(startPrice || endPrice || brandName){
+        filters = {
+          name: { $regex: new RegExp(normalizedKeyword, 'i') },
+          price: { $gte: startPrice, $lte: endPrice },
+          ...brandFilter
+        };
+    }
+
+    // Tính total dựa trên sự có hoặc không có từ khóa tìm kiếm và lọc theo giá và tên thương hiệu
+    const total = keyword
+      ? await Product.countDocuments({
+          ...filters
+        })
+      : await Product.countDocuments(filters);
+
+      let products;
+      // Fetch all products without skip and limit if start, end, or brand filter exists
+      if (brandName || startPrice || endPrice) {
+        products = await Product.find(filters)
+          .populate('category', 'name')
+          .populate('brand', 'name')
+          .populate('collectionId', 'name')
+          .skip(skip)
+          .limit(limit);
+      } else {
+          // Fetch products for the specified page and limit
+          console.log("all");
+        products = await Product.find()
+          .populate('category', 'name')
+          .populate('brand', 'name')
+          .populate('collectionId', 'name')
+          .skip(skip)
+          .limit(limit);
+        //   console.log(products);
+      }
   
-          const products = await Product.find({
-              name: { $regex: new RegExp(normalizedKeyword, 'i') }
-          })
-            .populate('category', 'name')
-            .populate('brand', 'name')
-            .populate('collectionId', 'name')
-            .skip(skip)
-            .limit(limit);
       
           const transformedProducts = products.map(product => ({
             productId: product._id,
@@ -195,7 +234,7 @@ const productController = {
             price: product.price,
             images: product.images,
           }));
-      
+          console.log(transformedProducts.length);
           res.status(200).json({ success: "Lấy toàn bộ sản phẩm thành công", data: transformedProducts, total });
         } catch (error) {
           res.status(500).json({ error: error.message });

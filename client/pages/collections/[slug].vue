@@ -2,12 +2,13 @@
         <ProductLayout>
           <UContainer>
             <div class="flex">
+              <!-- {{ selected.price.start }} -->
               <ProductSideBar :selected="selected" @clear-filters="handleClearFilters" @apply-filters="handleApplyFilters"></ProductSideBar>
               <div class="flex-1">
                 <h3 class="mb-10 pl-5">
                 <ULink active-class="text-primary" inactive-class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" to="/collections/all">Sản phẩm</ULink> -> {{categoryName}}</h3>
-                <div class="grid grid-cols-4 gap-4 px-3" v-if="filteredProducts.length">
-                    <UCard v-for="item in filteredProducts" :key="item._id" class="hover:shadow-2xl">
+                <div class="grid grid-cols-4 gap-4 px-3" v-if="products.length">
+                    <UCard v-for="item in products" :key="item._id" class="hover:shadow-2xl">
                     <div class="py-0">
                       <div>
                         <ULink :to="`/product/${item.productId || item._id}`">
@@ -61,6 +62,7 @@ const selected = ref({
 
 const handleApplyFilters = (appliedFilters) => {
   selected.value = appliedFilters.value;
+  page.value = 1
 };
 const handleClearFilters =()=>{
   selected.value = {price: null, brand: null}
@@ -77,16 +79,29 @@ const products = ref([
 const allProducts = ref([])
 const totalPage = ref(1)
 const categoryName = ref()
-const getAllProduct = async (pa, paCo)=>{
+const getAllProduct = async (pa, paCo, startPrice, endPrice, brandName)=>{
   let res
-  if(slug !== "all"){
-    // console.log(typeof slug);
-    res = await request.get(`product/getProductByCategory/${slug}?page=${pa}&limit=${paCo}`)
+  if (slug !== "all") {
+    res = await request.get(`product/getProductByCategory/${slug}?page=${pa}&limit=${paCo}`);
+  } else {
+    let url = `product/getAllProduct?page=${pa}&limit=${paCo}`;
 
-  }else{
-    res = await request.get(`product/getAllProduct?page=${pa}&limit=${paCo}`)
+    if (startPrice !== undefined) {
+      url += `&start=${startPrice}`;
+    }
+
+    if (endPrice !== undefined) {
+      url += `&end=${endPrice}`;
+    }
+
+    if (brandName) {
+      url += `&brandName=${brandName}`;
+    }
+
+    res = await request.get(url);
   }
   products.value = res.data.data
+  totalPage.value = res.data.total
 }
 const getCategory = async()=>{
   if(slug !== "all") {
@@ -137,7 +152,7 @@ const getAll = async ()=>{
 
 watchEffect(() => {
   // getTotalPage()
-  getAllProduct(page.value, pageCount.value);
+  getAllProduct(page.value, pageCount.value, selected.value.price?.start, selected.value.price?.end, selected.value.brand );
 });
 onMounted(()=>{
   // console.log(route.fullPath);
