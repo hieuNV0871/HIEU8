@@ -15,8 +15,23 @@ const productController = {
             const variantProducts = [];
             const product = await Product.findOne({name})
             if(product) return res.status(400).json({error: "Sản phẩm đã tồn tại"})
-            const cvtName = name.split(' ').map((word, index, array) => index === array.length - 1 ? word : word.charAt(0)).join('');
-            let skuProduct  = "NVH" + cvtName
+        const latestProduct = await Product.findOne({}, {}, { sort: { 'createdAt': -1 } });
+        let productOrder = 1;
+        const cate = await Category.findById(category)
+
+        if (latestProduct) {
+            const latestSku = latestProduct.sku;
+            const lastOrder = parseInt(latestSku.substring(3, 7), 10);
+            productOrder = Math.min(lastOrder + 1, 9999);
+            // productOrder = lastOrder + 1;
+        }
+        const paddedOrder = productOrder.toString().padStart(4, '0');
+        const categoryInitial = cate.name
+            .split(' ')
+            .map((word) => word.charAt(0).toUpperCase())
+            .join('');
+        const normalizedCvtCateName = unorm.nfkd(categoryInitial).replace(/[\u0300-\u036F]/g, '');
+        const skuProduct = `NVH${paddedOrder}${normalizedCvtCateName}`;
             const newProduct = new Product({
         name,
         sku: skuProduct,
@@ -34,11 +49,11 @@ const productController = {
         const color = await ColorProduct.findById(variant.colorId);
         const sku = `${skuProduct}${size.name}${color.name}`;
     
-        const variantKey = `${variant.sizeId}-${variant.colorId}`;
+        // const variantKey = `${variant.sizeId}-${variant.colorId}`;
         if (variant.quantity <= 0) {
             return res.status(400).json({ error: `so luong không hợp lệ cho biến thể có size ${size.name} và color ${color.name}` });
         }
-        if (!existingVariants.has(variantKey)) {
+        if (!existingVariants.has(sku)) {
             const variantProduct = new VariantProduct({
                 productId: newProduct._id,
                 sizeId: variant.sizeId,
@@ -47,7 +62,7 @@ const productController = {
                 sku: sku
             });
             variantProducts.push(variantProduct);
-            existingVariants.add(variantKey);
+            existingVariants.add(sku);
         } else {
             console.log(`Biến thể đã tồn tại cho size ${size.name} và color ${color.name}`);
         }
@@ -71,8 +86,19 @@ const productController = {
     
             const existingVariants = new Set();
             const variantProducts = [];
-            const cvtName = name.split(' ').map(tu =>tu.charAt(0)).join('')
-            let skuProduct  = "NVH"+ cvtName
+            const cate = await Category.findById(category)
+
+            const existingProduct = await Product.findById(productId)
+            let skuProduct
+            if(category){
+                const oldSku = existingProduct.sku.substring(0, 7);
+                const categoryInitial = cate.name
+                .split(' ')
+                .map((word) => word.charAt(0).toUpperCase())
+                .join('');
+            const normalizedCvtCateName = unorm.nfkd(categoryInitial).replace(/[\u0300-\u036F]/g, '');
+            skuProduct = `${oldSku}${normalizedCvtCateName}`;
+            }
             // Lấy danh sách biến thể hiện tại của sản phẩm
             const currentVariants = await VariantProduct.find({ productId: productId });
     
@@ -81,12 +107,12 @@ const productController = {
                 const variantKey = `${variant.sizeId}-${variant.colorId}`;
                 existingVariants.add(variantKey);
             });
-            
+            console.log(skuProduct);
             for (const variant of variants) {
                 const size = await SizeProduct.findById(variant.sizeId);
                 const color = await ColorProduct.findById(variant.colorId);
-                const sku = `${skuProduct}${size.name}${color.name}`;
-    
+                const sku = `${skuProduct || existingProduct.sku}${size.name}${color.name}`;
+                console.log(sku);
                 const variantKey = `${variant.sizeId}-${variant.colorId}`;
     
                 if (variant.quantity <= 0) {
@@ -94,6 +120,7 @@ const productController = {
                 }
     
                 if (!existingVariants.has(variantKey)) {
+                    console.log("them moi");
                     const variantProduct = new VariantProduct({
                         productId: productId,
                         sizeId: variant.sizeId,
@@ -105,7 +132,7 @@ const productController = {
                     variantProducts.push(variantProduct);
                     existingVariants.add(variantKey);
                 } else {
-                    await VariantProduct.findOneAndUpdate({ productId: productId, sizeId: variant.sizeId, colorId: variant.colorId }, { $set: { quantity: variant.quantity } });
+                    await VariantProduct.findOneAndUpdate({ productId: productId,  sizeId: variant.sizeId, colorId: variant.colorId }, { $set: { quantity: variant.quantity, sku } });
                 }
             }
     

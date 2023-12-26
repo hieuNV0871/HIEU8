@@ -1,6 +1,6 @@
 const {Product, VariantProduct, SizeProduct, ColorProduct} = require('../models/Product')
 const Orders = require('../models/Orders')
-
+const dayjs = require('dayjs')
 const statisticsController = {
   revenueStatistics: async (req, res) => {
     const { type, dateFrom, dateTo } = req.query;
@@ -9,9 +9,8 @@ const statisticsController = {
     defaultDateFrom.setMonth(defaultDateFrom.getMonth() - 1); 
     const startDate = dateFrom ? new Date(dateFrom) : defaultDateFrom;
     const endDate = dateTo ? new Date(dateTo) : new Date();
-  //  const df = moment(startDate).format('YYYY-MM-DD');
-  //   const t = moment(endDate).format('YYYY-MM-DD');
 
+    
     let step = -1;
     if (type == "day") {
         step = 10;

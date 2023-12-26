@@ -86,7 +86,8 @@ const variantProductSchema = new mongoose.Schema({
         require: true
     },
     sku: {
-        type: String
+        type: String,
+        unique: true
     }
 }, {timestamps: true})
 
